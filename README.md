@@ -4,7 +4,7 @@ Sistem Manajemen Reservasi Lapangan Olahraga (Futsal & Badminton) berbasis web, 
 
 Proyek ini juga disusun sebagai portofolio pemenuhan standar **Uji Kompetensi Analis Program (BNSP)**.
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 * **Sistem Otentikasi (Role-based)**: Terdapat dua peran utama, yaitu `CUSTOMER` dan `ADMIN` dengan otorisasi JWT yang aman.
 * **Anti-Double Booking**: Sistem transaksional database yang ketat (Tingkat Isolasi Serializable) memastikan satu jadwal tidak akan pernah bisa dipesan oleh dua orang di waktu yang bersamaan.
@@ -12,7 +12,7 @@ Proyek ini juga disusun sebagai portofolio pemenuhan standar **Uji Kompetensi An
 * **Panel Admin & Pelaporan**: Manajemen laporan terpusat bagi pengurus (Admin) untuk melihat seluruh jadwal, transaksi, dan riwayat pesanan pelanggan.
 * **Desain UI/UX Premium**: Antarmuka modern yang tidak kaku, dirancang dengan Tailwind CSS dan Plus Jakarta Sans typography.
 
-## 🛠 Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 * **Framework**: [Next.js 14 (App Router)](https://nextjs.org/)
 * **Database ORM**: [Prisma](https://www.prisma.io/)
@@ -21,7 +21,7 @@ Proyek ini juga disusun sebagai portofolio pemenuhan standar **Uji Kompetensi An
 * **Testing**: Vitest (Unit & Integration Testing)
 * **Auth**: Custom JWT session handling dengan library `jose`
 
-## 📂 Struktur Repositori
+## Struktur Repositori
 
 ```text
 .
@@ -37,7 +37,7 @@ Proyek ini juga disusun sebagai portofolio pemenuhan standar **Uji Kompetensi An
 └── README.md
 ```
 
-## 🚀 Panduan Instalasi dan Menjalankan (Development)
+## Panduan Instalasi dan Menjalankan (Development)
 
 Pastikan Anda telah menginstal **Node.js** (v18+) dan **PostgreSQL** di perangkat Anda.
 
@@ -72,7 +72,7 @@ Pastikan Anda telah menginstal **Node.js** (v18+) dan **PostgreSQL** di perangka
    ```
    Aplikasi dapat diakses melalui browser di alamat: `http://localhost:3000`
 
-## 🧪 Panduan Testing
+## Panduan Testing
 
 Aplikasi ini dilengkapi dengan unit testing dan integrasi testing untuk menjamin kualitas kode (menghindari error saat reservasi).
 Untuk menjalankan *test suite*, gunakan perintah:
@@ -82,7 +82,7 @@ cd app
 npm run test
 ```
 
-## 👥 Akun Demo (Seeder)
+## Akun Demo (Seeder)
 
 Jika Anda telah menjalankan langkah *seeder* (`npm run seed`), Anda bisa menggunakan akun berikut untuk masuk ke sistem:
 

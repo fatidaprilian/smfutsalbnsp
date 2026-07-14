@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         Role          @default(CUSTOMER)
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+model Court {
+  id           String        @id @default(cuid())
+  name         String
+  type         CourtType
+  pricePerHour Int
+  reservations Reservation[]
+}
+
+enum CourtType {
+  FUTSAL
+  BADMINTON
+}
+
+model Reservation {
+  id         String            @id @default(cuid())
+  courtId    String
+  court      Court             @relation(fields: [courtId], references: [id])
+  userId     String
+  user       User              @relation(fields: [userId], references: [id])
+  date       DateTime          @db.Date
+  startHour  Int
+  endHour    Int
+  totalPrice Int
+  status     ReservationStatus @default(CONFIRMED)
+  createdAt  DateTime          @default(now())
+
+  @@index([courtId, date, status])
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+}

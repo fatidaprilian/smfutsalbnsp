@@ -1,0 +1,39 @@
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { searchReservations } from "@/actions/reservation";
+import { prisma } from "@/lib/prisma";
+import { AdminReservationClient } from "./client";
+
+export default async function AdminReservationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    query?: string;
+    courtId?: string;
+    date?: string;
+    status?: string;
+  }>;
+}) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") redirect("/login");
+
+  const params = await searchParams;
+
+  const [reservations, courts] = await Promise.all([
+    searchReservations({
+      query: params.query,
+      courtId: params.courtId,
+      date: params.date,
+      status: params.status,
+    }),
+    prisma.court.findMany({ orderBy: [{ type: "asc" }, { name: "asc" }] }),
+  ]);
+
+  return (
+    <AdminReservationClient
+      reservations={JSON.parse(JSON.stringify(reservations))}
+      courts={courts}
+      filters={params}
+    />
+  );
+}

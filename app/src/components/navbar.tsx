@@ -22,14 +22,14 @@ export function NavBar({ role }: { role?: "ADMIN" | "CUSTOMER" }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex justify-between items-center">
         {/* Logo */}
         <div className="flex-shrink-0 flex items-center">
-          <Link href={role === "ADMIN" ? "/admin/reservations" : "/reservations"} className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          <Link href={role === "ADMIN" ? "/admin/reservations" : "/reservations"} className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 bg-zinc-950 rounded-lg flex items-center justify-center shadow-md group-hover:rotate-3 transition-transform">
+              <svg className="w-5 h-5 text-[#CCFF00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900">
-              SM<span className="text-blue-600">Sport</span>
+            <span className="font-extrabold text-xl tracking-tight text-zinc-950">
+              SM<span className="text-zinc-500 font-bold">Sport.</span>
             </span>
           </Link>
         </div>
@@ -42,13 +42,13 @@ export function NavBar({ role }: { role?: "ADMIN" | "CUSTOMER" }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative py-2 text-sm font-medium transition-colors ${
-                  isActive ? "text-blue-600" : "text-slate-600 hover:text-slate-900"
+                className={`relative py-2 text-sm font-bold transition-colors ${
+                  isActive ? "text-zinc-950" : "text-zinc-500 hover:text-zinc-900"
                 }`}
               >
                 {link.label}
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full shadow-[0_-2px_8px_rgba(37,99,235,0.4)]" />
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-950 rounded-t-full" />
                 )}
               </Link>
             );
@@ -60,12 +60,12 @@ export function NavBar({ role }: { role?: "ADMIN" | "CUSTOMER" }) {
           {role ? (
             <>
               <div className="hidden sm:block text-right">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{role}</p>
+                <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">{role}</p>
               </div>
               <form action={logout}>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 cursor-pointer"
+                  className="px-4 py-2 text-sm font-bold text-zinc-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer"
                 >
                   Keluar
                 </button>
@@ -73,10 +73,10 @@ export function NavBar({ role }: { role?: "ADMIN" | "CUSTOMER" }) {
             </>
           ) : (
             <>
-              <Link href="/login" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+              <Link href="/login" className="px-5 py-2.5 text-sm font-bold text-zinc-600 hover:text-zinc-950 transition-colors">
                 Masuk
               </Link>
-              <Link href="/register" className="px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-full transition-colors shadow-sm shadow-blue-500/30">
+              <Link href="/register" className="px-5 py-2.5 text-sm font-bold bg-zinc-950 text-white hover:bg-zinc-800 rounded-xl transition-all shadow-[0_4px_14px_0_rgb(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] active:scale-95">
                 Daftar
               </Link>
             </>

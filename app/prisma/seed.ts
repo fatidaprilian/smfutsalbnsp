@@ -8,6 +8,11 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  // --- Clean DB ---
+  await prisma.reservation.deleteMany();
+  await prisma.court.deleteMany();
+  await prisma.user.deleteMany();
+
   // --- Courts ---
   const courts = await Promise.all([
     prisma.court.create({
@@ -100,7 +105,8 @@ async function main() {
         startHour: 8,
         endHour: 10,
         totalPrice: 2 * courts[0].pricePerHour,
-        status: "CONFIRMED",
+        status: "COMPLETED",
+        paymentType: "FULL",
       },
     }),
     prisma.reservation.create({
@@ -111,7 +117,8 @@ async function main() {
         startHour: 14,
         endHour: 16,
         totalPrice: 2 * courts[0].pricePerHour,
-        status: "CONFIRMED",
+        status: "COMPLETED",
+        paymentType: "FULL",
       },
     }),
     prisma.reservation.create({
@@ -122,7 +129,8 @@ async function main() {
         startHour: 10,
         endHour: 12,
         totalPrice: 2 * courts[2].pricePerHour,
-        status: "CONFIRMED",
+        status: "COMPLETED",
+        paymentType: "DP",
       },
     }),
     prisma.reservation.create({

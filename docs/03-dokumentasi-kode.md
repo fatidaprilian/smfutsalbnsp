@@ -111,6 +111,7 @@ app/
 | `searchReservations` | Filter (lapangan, tanggal, status, kata kunci) | Pelanggan: hanya menampilkan miliknya; Admin: menampilkan semua | Daftar reservasi yang sesuai filter |
 | `processWalletPayment` | ID reservasi | Dicetuskan oleh E-Wallet → ubah status dari PENDING ke CONFIRMED | `{berhasil}` atau `{pesan error}` |
 | `completeReservation` | ID reservasi | Cek hak Admin → ubah status menjadi COMPLETED (Pelunasan) | `{berhasil}` atau `{pesan error}` |
+| `checkReservationStatus` | ID reservasi | Dicetuskan oleh antarmuka pengguna (polling 3 detik) | Status terbaru dari reservasi |
 
 **Fungsi pendukung internal:**
 
@@ -137,7 +138,15 @@ app/
 
 ---
 
-## 4. Algoritma Utama: Pengecekan Jadwal Bentrok
+## 4. Fitur Real-Time (Polling)
+
+Sistem menggunakan teknik *polling* (menarik data secara berkala) untuk menciptakan pengalaman *real-time* tanpa WebSocket (demi menghemat biaya *serverless*):
+1. **Ketersediaan Lapangan & Daftar Reservasi**: Menggunakan `router.refresh()` setiap 10 detik agar tampilan kisi-kisi jam dan tabel admin selalu terbarui jika ada pengguna lain yang mem-booking.
+2. **Pemindai Pembayaran QRIS**: Saat modal QRIS terbuka, sistem akan memanggil `checkReservationStatus` setiap 3 detik. Begitu pengguna berhasil membayar lewat HP (status berubah di DB), modal akan otomatis menutup dan halaman akan di-*refresh*.
+
+---
+
+## 5. Algoritma Utama: Pengecekan Jadwal Bentrok
 
 Berikut adalah logika pengecekan yang digunakan untuk mencegah double booking:
 

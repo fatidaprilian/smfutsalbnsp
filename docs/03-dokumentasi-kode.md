@@ -76,7 +76,13 @@ app/
 | `getSession()` | Membaca token sesi dari cookie dan mengembalikan identitas pengguna (ID dan peran), atau `null` jika belum login |
 | `destroySession()` | Menghapus cookie sesi saat pengguna logout |
 
-### 3.2 `lib/validations.ts` — Aturan Validasi Input
+### 3.2 `lib/time.ts` — Utilitas Waktu (Adaptif)
+
+| Nama Fungsi | Penjelasan |
+|---|---|
+| `getWIBDate(timezone)` | Menghasilkan objek Date yang output jamnya disesuaikan dengan zona waktu tertentu (default: Asia/Jakarta). Fungsi ini menyelesaikan masalah perbedaan jam ketika dideploy di serverless Vercel (UTC) versus localhost (WIB) tanpa perlu pengaturan *Environment Variable* eksternal. |
+
+### 3.3 `lib/validations.ts` — Aturan Validasi Input
 
 | Nama Skema | Kolom yang Dicek | Aturan |
 |---|---|---|
@@ -86,7 +92,7 @@ app/
 | `searchReservationSchema` | query?, courtId?, date?, status? | Status boleh PENDING, CONFIRMED, COMPLETED, CANCELLED |
 | `laporanSchema` | startDate, endDate, courtId? | Kedua tanggal harus valid |
 
-### 3.3 `actions/auth.ts` — Proses Autentikasi
+### 3.4 `actions/auth.ts` — Proses Autentikasi
 
 | Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
@@ -94,7 +100,7 @@ app/
 | `login` | Email, kata sandi | Periksa data → cari pengguna → cocokkan kata sandi → buat sesi → arahkan sesuai peran | Diarahkan ke halaman yang sesuai (pelanggan atau admin) |
 | `logout` | — | Hapus cookie sesi | Diarahkan ke halaman login |
 
-### 3.4 `actions/reservation.ts` — Proses Reservasi
+### 3.5 `actions/reservation.ts` — Proses Reservasi
 
 | Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
@@ -113,13 +119,14 @@ app/
 | `checkConflict(...)` | Memeriksa apakah ada reservasi lain yang sudah terkonfirmasi dan waktunya bertabrakan dengan slot yang diminta |
 | `withSerializableRetry(fn, maxRetries)` | Menjalankan ulang proses otomatis jika database menolak karena ada dua permintaan yang bertabrakan di waktu bersamaan |
 
-### 3.5 `actions/laporan.ts` — Proses Laporan
+### 3.6 `actions/laporan.ts` — Proses Laporan
 
 | Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
 | `getLaporanPenggunaan` | Tanggal mulai, tanggal selesai, lapangan (opsional) | Cek hak akses admin → periksa data → ambil data reservasi terkonfirmasi → hitung total | `{totalJam, totalPendapatan, rincianPerLapangan[]}` |
+| *Cetak PDF Laporan* | Tombol Cetak | Dipicu dari antarmuka pengguna (`window.print()`). Menggunakan *Print Stylesheet* (`@media print`) | Format laporan fisik/PDF tanpa *navbar* dan tombol |
 
-### 3.6 `middleware.ts` — Pengaman Halaman
+### 3.7 `middleware.ts` — Pengaman Halaman
 
 | Kondisi | Tindakan Sistem |
 |---|---|

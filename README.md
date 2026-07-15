@@ -87,9 +87,9 @@ npm run test
 Jika Anda telah menjalankan langkah *seeder* (`npm run seed`), Anda bisa menggunakan akun berikut untuk masuk ke sistem:
 
 **Akun Pelanggan (Customer):**
-- **Email:** user@example.com
+- **Email:** budi@email.com
 - **Password:** password123
 
 **Akun Administrator (Admin):**
-- **Email:** admin@smsc.com
+- **Email:** admin@smsportcenter.com
 - **Password:** admin123

@@ -6,8 +6,10 @@ import {
   createReservation,
   updateReservation,
   cancelReservation,
+  checkReservationStatus,
   type ReservationResult,
 } from "@/actions/reservation";
+import { useEffect } from "react";
 
 type Slot = { hour: number; available: boolean };
 type CourtSlots = {
@@ -75,6 +77,28 @@ export function CustomerReservationClient({
       currency: "IDR",
       minimumFractionDigits: 0,
     }).format(price);
+
+  // Auto-refresh data secara berkala (Real-time updates)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      router.refresh();
+    }, 10000); // Tiap 10 detik
+    return () => clearInterval(interval);
+  }, [router]);
+
+  // Polling status QRIS secara agresif (Real-time Payment Detection)
+  useEffect(() => {
+    if (!payModalId) return;
+    const interval = setInterval(async () => {
+      const status = await checkReservationStatus(payModalId);
+      if (status === "CONFIRMED") {
+        setPayModalId(null);
+        router.refresh();
+        alert("Pembayaran Berhasil Dikonfirmasi!");
+      }
+    }, 3000); // Cek tiap 3 detik
+    return () => clearInterval(interval);
+  }, [payModalId, router]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

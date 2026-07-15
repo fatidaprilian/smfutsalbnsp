@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { cancelReservation } from "@/actions/reservation";
+import { cancelReservation, completeReservation } from "@/actions/reservation";
 
 type Court = { id: string; name: string; type: string; pricePerHour: number };
 type Reservation = {
@@ -63,6 +63,14 @@ export function AdminReservationClient({
       currency: "IDR",
       minimumFractionDigits: 0,
     }).format(price);
+
+  // Auto-refresh data secara berkala (Real-time updates)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      router.refresh();
+    }, 10000); // Tiap 10 detik
+    return () => clearInterval(interval);
+  }, [router]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

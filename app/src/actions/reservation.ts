@@ -389,6 +389,15 @@ export async function processWalletPayment(reservationId: string): Promise<Reser
   return { success: true };
 }
 
+// --- Check Reservation Status (Polling) ---
+export async function checkReservationStatus(reservationId: string) {
+  const existing = await prisma.reservation.findUnique({
+    where: { id: reservationId },
+    select: { status: true },
+  });
+  return existing?.status;
+}
+
 // --- Complete Reservation (Admin) ---
 export async function completeReservation(reservationId: string): Promise<ReservationResult> {
   const session = await getSession();

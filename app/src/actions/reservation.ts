@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { reservationSchema, searchReservationSchema } from "@/lib/validations";
+import { getWIBDate } from "@/lib/time";
 import { Prisma } from "@/generated/prisma";
 
 export type ReservationResult = {
@@ -127,7 +128,7 @@ export async function createReservation(
 
   // Mencegah CUSTOMER memesan jam yang sudah lewat di hari yang sama
   if (session.role === "CUSTOMER") {
-    const now = new Date();
+    const now = getWIBDate();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     if (reservationDate.getTime() < today.getTime()) {
       return { error: "Tidak bisa memesan untuk tanggal yang sudah lewat." };
@@ -223,7 +224,7 @@ export async function updateReservation(
 
   // Mencegah CUSTOMER mengubah ke jam yang sudah lewat di hari yang sama
   if (session.role === "CUSTOMER") {
-    const now = new Date();
+    const now = getWIBDate();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     if (reservationDate.getTime() < today.getTime()) {
       return { error: "Tidak bisa mengubah ke tanggal yang sudah lewat." };

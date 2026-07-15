@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { searchReservations, getAvailableSlots } from "@/actions/reservation";
 import { prisma } from "@/lib/prisma";
 import { CustomerReservationClient } from "./client";
+import { getWIBDate } from "@/lib/time";
 
 export default async function ReservationsPage({
   searchParams,
@@ -14,7 +15,7 @@ export default async function ReservationsPage({
 
   const params = await searchParams;
 
-  const today = new Date();
+  const today = getWIBDate();
   today.setHours(0, 0, 0, 0);
   const selectedDate = params.date || today.toISOString().split("T")[0];
 

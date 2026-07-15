@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getAvailableSlots } from "@/actions/reservation";
+import { getWIBDate } from "@/lib/time";
 
 // Cache halaman ini selama 60 detik (ISR)
 export const revalidate = 60;
@@ -14,7 +15,7 @@ export default async function Home() {
     redirect("/reservations");
   }
 
-  const todayDate = new Date();
+  const todayDate = getWIBDate();
   const todayStr = todayDate.toISOString().split("T")[0];
   const courts = await getAvailableSlots(todayStr);
 
@@ -71,7 +72,7 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {courts.map((court) => {
-              const currentHour = new Date().getHours();
+              const currentHour = getWIBDate().getHours();
               const validSlots = court.slots.map(s => ({
                 ...s,
                 isPast: s.hour <= currentHour,

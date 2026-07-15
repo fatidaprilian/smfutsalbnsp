@@ -81,12 +81,16 @@ export async function getAvailableSlots(dateStr: string) {
       (r) => r.courtId === court.id
     );
 
+    const now = getWIBDate();
+    const isToday = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+
     const slots: { hour: number; available: boolean }[] = [];
     for (let h = 8; h < 22; h++) {
       const isBooked = courtReservations.some(
         (r) => r.startHour <= h && r.endHour > h
       );
-      slots.push({ hour: h, available: !isBooked });
+      const isPast = isToday && h <= now.getHours();
+      slots.push({ hour: h, available: !isBooked && !isPast });
     }
 
     return {

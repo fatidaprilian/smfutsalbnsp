@@ -22,7 +22,7 @@ export function NavBar({ role }: { role?: "ADMIN" | "CUSTOMER" }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex justify-between items-center">
         {/* Logo */}
         <div className="flex-shrink-0 flex items-center">
-          <Link href={role === "ADMIN" ? "/admin/reservations" : "/reservations"} className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 bg-zinc-950 rounded-lg flex items-center justify-center shadow-md group-hover:rotate-3 transition-transform">
               <svg className="w-5 h-5 text-[#CCFF00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />

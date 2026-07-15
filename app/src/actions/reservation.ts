@@ -24,7 +24,7 @@ async function checkConflict(
     where: {
       courtId,
       date,
-      status: "CONFIRMED",
+      status: { in: ["CONFIRMED", "PENDING"] },
       startHour: { lt: endHour },
       endHour: { gt: startHour },
       ...(excludeId ? { id: { not: excludeId } } : {}),
@@ -66,7 +66,7 @@ export async function getAvailableSlots(dateStr: string) {
   const reservations = await prisma.reservation.findMany({
     where: {
       date,
-      status: "CONFIRMED",
+      status: { in: ["CONFIRMED", "PENDING"] },
     },
     select: {
       courtId: true,
@@ -113,6 +113,7 @@ export async function createReservation(
     date: formData.get("date"),
     startHour: formData.get("startHour"),
     endHour: formData.get("endHour"),
+    paymentType: formData.get("paymentType") || "DP",
   };
 
   const parsed = reservationSchema.safeParse(raw);
@@ -120,9 +121,21 @@ export async function createReservation(
     return { error: parsed.error.issues[0].message };
   }
 
-  const { courtId, date, startHour, endHour } = parsed.data;
+  const { courtId, date, startHour, endHour, paymentType } = parsed.data;
   const reservationDate = new Date(date);
   reservationDate.setHours(0, 0, 0, 0);
+
+  // Mencegah CUSTOMER memesan jam yang sudah lewat di hari yang sama
+  if (session.role === "CUSTOMER") {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (reservationDate.getTime() < today.getTime()) {
+      return { error: "Tidak bisa memesan untuk tanggal yang sudah lewat." };
+    }
+    if (reservationDate.getTime() === today.getTime() && startHour <= now.getHours()) {
+      return { error: "Waktu tersebut sudah terlewat. Silakan pilih jam lain." };
+    }
+  }
 
   try {
     await withSerializableRetry(() =>
@@ -151,6 +164,8 @@ export async function createReservation(
               startHour,
               endHour,
               totalPrice: (endHour - startHour) * court.pricePerHour,
+              paymentType,
+              status: "PENDING",
             },
           });
         },
@@ -205,6 +220,18 @@ export async function updateReservation(
   const { courtId, date, startHour, endHour } = parsed.data;
   const reservationDate = new Date(date);
   reservationDate.setHours(0, 0, 0, 0);
+
+  // Mencegah CUSTOMER mengubah ke jam yang sudah lewat di hari yang sama
+  if (session.role === "CUSTOMER") {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (reservationDate.getTime() < today.getTime()) {
+      return { error: "Tidak bisa mengubah ke tanggal yang sudah lewat." };
+    }
+    if (reservationDate.getTime() === today.getTime() && startHour <= now.getHours()) {
+      return { error: "Waktu tersebut sudah terlewat. Silakan pilih jam lain." };
+    }
+  }
 
   try {
     await withSerializableRetry(() =>
@@ -336,4 +363,51 @@ export async function searchReservations(params: {
     orderBy: [{ date: "desc" }, { startHour: "asc" }],
     take: 100,
   });
+}
+
+// --- Process Wallet Payment (Simulator) ---
+export async function processWalletPayment(reservationId: string): Promise<ReservationResult> {
+  const existing = await prisma.reservation.findUnique({
+    where: { id: reservationId },
+  });
+  if (!existing) {
+    return { error: "Reservasi tidak ditemukan" };
+  }
+  if (existing.status !== "PENDING") {
+    return { error: "Status reservasi bukan PENDING" };
+  }
+
+  await prisma.reservation.update({
+    where: { id: reservationId },
+    data: { status: "CONFIRMED" },
+  });
+
+  revalidatePath("/reservations");
+  revalidatePath("/admin/reservations");
+  revalidatePath(`/pay/${reservationId}`);
+  return { success: true };
+}
+
+// --- Complete Reservation (Admin) ---
+export async function completeReservation(reservationId: string): Promise<ReservationResult> {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") {
+    return { error: "Hanya Admin yang dapat melakukan pelunasan" };
+  }
+
+  const existing = await prisma.reservation.findUnique({
+    where: { id: reservationId },
+  });
+  if (!existing) {
+    return { error: "Reservasi tidak ditemukan" };
+  }
+
+  await prisma.reservation.update({
+    where: { id: reservationId },
+    data: { status: "COMPLETED" },
+  });
+
+  revalidatePath("/reservations");
+  revalidatePath("/admin/reservations");
+  return { success: true };
 }

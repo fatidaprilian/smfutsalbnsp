@@ -46,6 +46,7 @@
 |---|---|---|---|---|---|
 | 3 | Reservasi di slot yang masih kosong | Jam 10:00–12:00 | Tidak ada bentrok → data bisa disimpan | `adaBentrok = false` | LULUS |
 | 4 | Reservasi di slot yang bertabrakan | Jam 09:00–11:00 (bertabrakan dengan 08:00–10:00) | Bentrok terdeteksi | `adaBentrok = true` | LULUS |
+| 4.1 | Reservasi di jam yang sudah lewat hari ini | Jam 08:00 pagi (saat ini sudah siang) | Ditolak oleh sistem | Pesan error "Waktu terlewat" | LULUS |
 | 5 | Memesan slot yang sebelumnya dibatalkan | Jam 18:00–19:00 (slot dengan status CANCELLED) | Tidak ada bentrok (boleh dipesan ulang) | `adaBentrok = false` | LULUS |
 | 6 | Memesan di jam yang persis sama | Jam 08:00–10:00 (sama persis dengan yang sudah ada) | Bentrok terdeteksi | `adaBentrok = true` | LULUS |
 | 7 | Memesan slot yang bersebelahan | Jam 10:00–14:00 (langsung setelah 08:00–10:00) | Tidak ada bentrok | `adaBentrok = false` | LULUS |

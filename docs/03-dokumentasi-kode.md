@@ -38,24 +38,27 @@ app/
 │   ├── components/
 │   │   └── navbar.tsx         # Navigasi atas (menu berbeda untuk admin dan customer)
 │   ├── middleware.ts           # Pengaman halaman: arahkan pengguna ke halaman yang sesuai
-│   ├── app/
-│   │   ├── layout.tsx         # Tampilan dasar yang dipakai semua halaman
-│   │   ├── page.tsx           # Halaman utama (langsung diarahkan sesuai peran pengguna)
-│   │   ├── login/page.tsx     # Halaman login
-│   │   ├── register/page.tsx  # Halaman daftar akun (khusus pelanggan)
-│   │   ├── reservations/
-│   │   │   ├── page.tsx       # Ambil data reservasi dari server
-│   │   │   └── client.tsx     # Tampilan interaktif untuk pelanggan
-│   │   └── admin/
-│   │       ├── reservations/
-│   │       │   ├── page.tsx   # Ambil semua data reservasi dari server
-│   │       │   └── client.tsx # Tampilan dengan filter dan tombol batalkan (admin)
-│   │       └── laporan/
-│   │           ├── page.tsx   # Ambil daftar lapangan dari server
-│   │           └── client.tsx # Tampilan form laporan dan tabel hasil
-│   └── __tests__/
-│       ├── auth.test.ts       # Pengujian unit: logika login
-│       └── reservation.test.ts # Pengujian unit: cek bentrok jadwal dan kalkulasi harga
+│   │   ├── app/
+│   │   │   ├── layout.tsx         # Tampilan dasar yang dipakai semua halaman
+│   │   │   ├── page.tsx           # Halaman utama (langsung diarahkan sesuai peran pengguna)
+│   │   │   ├── login/page.tsx     # Halaman login
+│   │   │   ├── register/page.tsx  # Halaman daftar akun (khusus pelanggan)
+│   │   │   ├── pay/[id]/          # Route Publik E-Wallet Simulasi
+│   │   │   │   ├── page.tsx       # Ambil data reservasi dari server
+│   │   │   │   └── client.tsx     # Antarmuka E-Wallet interaktif
+│   │   │   ├── reservations/
+│   │   │   │   ├── page.tsx       # Ambil data reservasi dari server
+│   │   │   │   └── client.tsx     # Tampilan interaktif untuk pelanggan
+│   │   │   └── admin/
+│   │   │       ├── reservations/
+│   │   │       │   ├── page.tsx   # Ambil semua data reservasi dari server
+│   │   │       │   └── client.tsx # Tampilan dengan filter dan tombol batalkan (admin)
+│   │   │       └── laporan/
+│   │   │           ├── page.tsx   # Ambil daftar lapangan dari server
+│   │   │           └── client.tsx # Tampilan form laporan dan tabel hasil
+│   │   └── __tests__/
+│   │       ├── auth.test.ts       # Pengujian unit: logika login
+│   │       └── reservation.test.ts # Pengujian unit: cek bentrok jadwal dan kalkulasi harga
 └── vitest.config.ts           # Pengaturan alat pengujian otomatis (Vitest)
 ```
 
@@ -79,8 +82,8 @@ app/
 |---|---|---|
 | `loginSchema` | email, password | Email harus format yang valid, kata sandi minimal 8 karakter |
 | `registerSchema` | name, email, password | Nama wajib diisi, email valid, kata sandi antara 8–128 karakter |
-| `reservationSchema` | courtId, date, startHour, endHour | Lapangan wajib dipilih, tanggal valid, jam antara 08:00–22:00, jam selesai harus lebih besar dari jam mulai |
-| `searchReservationSchema` | query?, courtId?, date?, status? | Status hanya boleh CONFIRMED atau CANCELLED |
+| `reservationSchema` | courtId, date, startHour, endHour, paymentType | Lapangan wajib, tanggal valid, jam 08:00–22:00, jam selesai > jam mulai, tipe bayar DP/FULL |
+| `searchReservationSchema` | query?, courtId?, date?, status? | Status boleh PENDING, CONFIRMED, COMPLETED, CANCELLED |
 | `laporanSchema` | startDate, endDate, courtId? | Kedua tanggal harus valid |
 
 ### 3.3 `actions/auth.ts` — Proses Autentikasi
@@ -95,11 +98,13 @@ app/
 
 | Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
-| `getAvailableSlots` | Tanggal | Ambil semua lapangan + cek reservasi yang sudah terkonfirmasi di tanggal itu → tampilkan slot kosong dan terisi | Daftar lapangan beserta keterangan slot per jam |
-| `createReservation` | Data formulir | Periksa data → jalankan proses terkunci di database (cek bentrok → hitung harga → simpan) | `{berhasil}` atau `{pesan error}` |
+| `getAvailableSlots` | Tanggal | Ambil lapangan + cek reservasi terkonfirmasi & pending → tampilkan slot kosong/terisi | Daftar lapangan beserta keterangan slot per jam |
+| `createReservation` | Data formulir | Periksa data → jalankan transaksi terkunci (cek bentrok → hitung harga → simpan sbg PENDING) | `{berhasil}` atau `{pesan error}` |
 | `updateReservation` | ID reservasi, data formulir | Cek kepemilikan → Periksa data → jalankan proses terkunci (cek bentrok kecuali reservasi sendiri → perbarui data) | `{berhasil}` atau `{pesan error}` |
 | `cancelReservation` | ID reservasi | Cek kepemilikan → ubah status menjadi CANCELLED | `{berhasil}` atau `{pesan error}` |
 | `searchReservations` | Filter (lapangan, tanggal, status, kata kunci) | Pelanggan: hanya menampilkan miliknya; Admin: menampilkan semua | Daftar reservasi yang sesuai filter |
+| `processWalletPayment` | ID reservasi | Dicetuskan oleh E-Wallet → ubah status dari PENDING ke CONFIRMED | `{berhasil}` atau `{pesan error}` |
+| `completeReservation` | ID reservasi | Cek hak Admin → ubah status menjadi COMPLETED (Pelunasan) | `{berhasil}` atau `{pesan error}` |
 
 **Fungsi pendukung internal:**
 
@@ -134,7 +139,7 @@ FUNGSI cekBentrok(lapangan, tanggal, jamMulai, jamSelesai, kecualikanId):
   data = AMBIL DARI Reservation
          WHERE lapangan = lapangan
            AND tanggal = tanggal
-           AND status = 'CONFIRMED'
+           AND status IN ('CONFIRMED', 'PENDING')
            AND jamMulai reservasi lain < jamSelesai yang diminta
            AND jamSelesai reservasi lain > jamMulai yang diminta
            AND id != kecualikanId   (diabaikan saat sedang mengedit reservasi sendiri)

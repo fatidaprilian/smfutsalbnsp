@@ -13,6 +13,7 @@ type Reservation = {
   endHour: number;
   totalPrice: number;
   status: string;
+  paymentType: string;
   court: { name: string; type: string };
   user: { name: string; email: string };
   createdAt: string;
@@ -99,7 +100,9 @@ export function AdminReservationClient({
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Semua Status</option>
+            <option value="PENDING">Menunggu Bayar</option>
             <option value="CONFIRMED">Dikonfirmasi</option>
+            <option value="COMPLETED">Selesai</option>
             <option value="CANCELLED">Dibatalkan</option>
           </select>
           <div className="flex gap-2">
@@ -151,27 +154,51 @@ export function AdminReservationClient({
                     <td className="py-3 px-4">
                       {String(r.startHour).padStart(2, "0")}:00 – {String(r.endHour).padStart(2, "0")}:00
                     </td>
-                    <td className="py-3 px-4">{formatPrice(r.totalPrice)}</td>
+                    <td className="py-3 px-4">
+                      {formatPrice(r.totalPrice)}
+                      <span className="block mt-1 text-[10px] uppercase font-bold text-gray-500">
+                        {r.paymentType === "DP" ? "DP 50%" : "LUNAS"}
+                      </span>
+                    </td>
                     <td className="py-3 px-4">
                       <span
                         className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
                           r.status === "CONFIRMED"
                             ? "bg-green-100 text-green-700"
+                            : r.status === "PENDING"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : r.status === "COMPLETED"
+                            ? "bg-blue-100 text-blue-700"
                             : "bg-gray-100 text-gray-500"
                         }`}
                       >
-                        {r.status === "CONFIRMED" ? "Dikonfirmasi" : "Dibatalkan"}
+                        {r.status === "CONFIRMED" ? "Dikonfirmasi" : r.status === "PENDING" ? "Menunggu Bayar" : r.status === "COMPLETED" ? "Selesai" : "Dibatalkan"}
                       </span>
                     </td>
                     <td className="py-3 px-4">
-                      {r.status === "CONFIRMED" && (
-                        <button
-                          onClick={() => handleCancel(r.id)}
-                          className="text-red-600 hover:underline text-xs cursor-pointer"
-                        >
-                          Batalkan
-                        </button>
-                      )}
+                      <div className="flex flex-col gap-2">
+                        {r.status === "CONFIRMED" && r.paymentType === "DP" && (
+                          <button
+                            onClick={async () => {
+                              if(confirm("Pelanggan sudah melunasi sisa tagihan di kasir?")) {
+                                const { completeReservation } = await import('@/actions/reservation');
+                                await completeReservation(r.id);
+                              }
+                            }}
+                            className="text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-[10px] font-medium transition-colors w-max shadow-sm"
+                          >
+                            Pelunasan
+                          </button>
+                        )}
+                        {(r.status === "CONFIRMED" || r.status === "PENDING") && (
+                          <button
+                            onClick={() => handleCancel(r.id)}
+                            className="text-red-600 hover:underline text-xs cursor-pointer text-left w-max"
+                          >
+                            Batalkan
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

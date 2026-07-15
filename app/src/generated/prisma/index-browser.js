@@ -144,6 +144,7 @@ exports.Prisma.ReservationScalarFieldEnum = {
   startHour: 'startHour',
   endHour: 'endHour',
   totalPrice: 'totalPrice',
+  paymentType: 'paymentType',
   status: 'status',
   createdAt: 'createdAt'
 };
@@ -168,7 +169,9 @@ exports.CourtType = exports.$Enums.CourtType = {
 };
 
 exports.ReservationStatus = exports.$Enums.ReservationStatus = {
+  PENDING: 'PENDING',
   CONFIRMED: 'CONFIRMED',
+  COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED'
 };
 

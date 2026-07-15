@@ -31,7 +31,8 @@ erDiagram
         int startHour "8-21"
         int endHour "9-22"
         int totalPrice "snapshot harga"
-        ReservationStatus status "CONFIRMED | CANCELLED"
+        string paymentType "DP | FULL"
+        ReservationStatus status "PENDING | CONFIRMED | COMPLETED | CANCELLED"
         datetime createdAt
     }
 
@@ -46,8 +47,9 @@ erDiagram
 | Satu tabel `User` dengan field `role` | Tidak perlu tabel terpisah untuk admin dan customer — strukturnya sama |
 | Slot jam menggunakan integer (8–22) | Query overlap jadi sederhana (`startHour < endHour AND endHour > startHour`), tidak perlu timestamp |
 | `totalPrice` disimpan sebagai snapshot | Harga per jam (`pricePerHour`) bisa berubah di kemudian hari, laporan historis harus tetap akurat |
+| `paymentType` | Meyimpan preferensi pembayaran pelanggan: "DP" (50%) atau "FULL" (100%). |
 | Index `(courtId, date, status)` | Query ketersediaan selalu filter tiga kolom ini — index komposit mempercepat query utama |
-| `status` enum (`CONFIRMED`/`CANCELLED`) | Soft delete — data reservasi yang dibatalkan tetap tersimpan untuk laporan |
+| `status` enum | `PENDING` (Tunggu bayar QRIS), `CONFIRMED` (Sudah bayar/DP), `COMPLETED` (Sudah lunas & selesai), `CANCELLED` (Batal). Soft delete. |
 
 ## 3. SQL Script (Migration)
 
@@ -61,7 +63,7 @@ CREATE TYPE "Role" AS ENUM ('ADMIN', 'CUSTOMER');
 CREATE TYPE "CourtType" AS ENUM ('FUTSAL', 'BADMINTON');
 
 -- CreateEnum
-CREATE TYPE "ReservationStatus" AS ENUM ('CONFIRMED', 'CANCELLED');
+CREATE TYPE "ReservationStatus" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -94,7 +96,8 @@ CREATE TABLE "Reservation" (
     "startHour" INTEGER NOT NULL,
     "endHour" INTEGER NOT NULL,
     "totalPrice" INTEGER NOT NULL,
-    "status" "ReservationStatus" NOT NULL DEFAULT 'CONFIRMED',
+    "paymentType" TEXT NOT NULL DEFAULT 'DP',
+    "status" "ReservationStatus" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Reservation_pkey" PRIMARY KEY ("id")

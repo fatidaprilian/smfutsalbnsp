@@ -27,6 +27,7 @@ export const reservationSchema = z.object({
     .int()
     .min(9, "Jam selesai minimal 09:00")
     .max(22, "Jam selesai maksimal 22:00"),
+  paymentType: z.enum(["DP", "FULL"]).default("DP"),
 }).refine((data) => data.endHour > data.startHour, {
   message: "Jam selesai harus lebih besar dari jam mulai",
   path: ["endHour"],
@@ -36,7 +37,7 @@ export const searchReservationSchema = z.object({
   query: z.string().optional(),
   courtId: z.string().optional(),
   date: z.string().optional(),
-  status: z.enum(["CONFIRMED", "CANCELLED"]).optional(),
+  status: z.enum(["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"]).optional(),
 });
 
 export const laporanSchema = z.object({

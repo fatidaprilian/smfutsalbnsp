@@ -26,6 +26,7 @@ type Reservation = {
   endHour: number;
   totalPrice: number;
   status: string;
+  paymentType: string;
   court: { name: string; type: string };
   createdAt: string;
 };
@@ -46,6 +47,7 @@ export function CustomerReservationClient({
   const router = useRouter();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState(searchQuery);
+  const [payModalId, setPayModalId] = useState<string | null>(null);
 
   const [createState, createAction, isCreating] = useActionState<
     ReservationResult,
@@ -155,7 +157,7 @@ export function CustomerReservationClient({
           </div>
         )}
 
-        <form action={createAction} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <form action={createAction} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <input type="hidden" name="date" value={selectedDate} />
           <div>
             <label htmlFor="courtId" className="block text-sm font-medium text-gray-700 mb-1">Lapangan</label>
@@ -179,11 +181,36 @@ export function CustomerReservationClient({
               id="startHour"
               name="startHour"
               required
+              onChange={(e) => {
+                const form = e.target.form;
+                if (form) {
+                  const endSelect = form.elements.namedItem("endHour") as HTMLSelectElement;
+                  if (endSelect) {
+                    const startVal = parseInt(e.target.value);
+                    Array.from(endSelect.options).forEach(opt => {
+                      const optVal = parseInt(opt.value);
+                      const isPast = selectedDate === new Date().toISOString().split("T")[0] && optVal <= new Date().getHours();
+                      opt.disabled = isPast || optVal <= startVal;
+                      if (opt.selected && opt.disabled) {
+                        endSelect.value = "";
+                      }
+                    });
+                  }
+                }
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {Array.from({ length: 14 }, (_, i) => i + 8).map((h) => (
-                <option key={h} value={h}>{String(h).padStart(2, "0")}:00</option>
-              ))}
+              <option value="">Pilih Jam</option>
+              {Array.from({ length: 14 }, (_, i) => i + 8).map((h) => {
+                const todayLocal = new Date();
+                todayLocal.setMinutes(todayLocal.getMinutes() - todayLocal.getTimezoneOffset());
+                const isPast = selectedDate === todayLocal.toISOString().split("T")[0] && h <= new Date().getHours();
+                return (
+                  <option key={h} value={h} disabled={isPast}>
+                    {String(h).padStart(2, "0")}:00
+                  </option>
+                );
+              })}
             </select>
           </div>
           <div>
@@ -194,9 +221,29 @@ export function CustomerReservationClient({
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {Array.from({ length: 14 }, (_, i) => i + 9).map((h) => (
-                <option key={h} value={h}>{String(h).padStart(2, "0")}:00</option>
-              ))}
+              <option value="">Pilih Jam</option>
+              {Array.from({ length: 14 }, (_, i) => i + 9).map((h) => {
+                const todayLocal = new Date();
+                todayLocal.setMinutes(todayLocal.getMinutes() - todayLocal.getTimezoneOffset());
+                const isPast = selectedDate === todayLocal.toISOString().split("T")[0] && h <= new Date().getHours();
+                return (
+                  <option key={h} value={h} disabled={isPast}>
+                    {String(h).padStart(2, "0")}:00
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="paymentType" className="block text-sm font-medium text-gray-700 mb-1">Tipe Bayar</label>
+            <select
+              id="paymentType"
+              name="paymentType"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="DP">DP 50%</option>
+              <option value="FULL">Lunas 100%</option>
             </select>
           </div>
           <div className="flex items-end">
@@ -263,29 +310,43 @@ export function CustomerReservationClient({
                         className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
                           r.status === "CONFIRMED"
                             ? "bg-green-100 text-green-700"
+                            : r.status === "PENDING"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : r.status === "COMPLETED"
+                            ? "bg-blue-100 text-blue-700"
                             : "bg-gray-100 text-gray-500"
                         }`}
                       >
-                        {r.status === "CONFIRMED" ? "Dikonfirmasi" : "Dibatalkan"}
+                        {r.status === "CONFIRMED" ? "Dikonfirmasi" : r.status === "PENDING" ? "Menunggu Bayar" : r.status === "COMPLETED" ? "Selesai" : "Dibatalkan"}
                       </span>
                     </td>
                     <td className="py-3 px-3">
-                      {r.status === "CONFIRMED" && (
-                        <div className="flex gap-2">
+                      <div className="flex flex-col gap-2">
+                        {r.status === "PENDING" && (
                           <button
-                            onClick={() => setEditingId(editingId === r.id ? null : r.id)}
-                            className="text-blue-600 hover:underline text-xs cursor-pointer"
+                            onClick={() => setPayModalId(r.id)}
+                            className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium transition-colors w-max cursor-pointer shadow-sm"
                           >
-                            Edit
+                            Bayar QRIS
                           </button>
-                          <button
-                            onClick={() => handleCancel(r.id)}
-                            className="text-red-600 hover:underline text-xs cursor-pointer"
-                          >
-                            Batalkan
-                          </button>
-                        </div>
-                      )}
+                        )}
+                        {(r.status === "CONFIRMED" || r.status === "PENDING") && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setEditingId(editingId === r.id ? null : r.id)}
+                              className="text-blue-600 hover:underline text-xs cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleCancel(r.id)}
+                              className="text-red-600 hover:underline text-xs cursor-pointer"
+                            >
+                              Batalkan
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -304,6 +365,53 @@ export function CustomerReservationClient({
           />
         )}
       </div>
+
+      {/* QR Code Modal */}
+      {payModalId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+            <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="font-semibold text-gray-800">Scan untuk Membayar</h3>
+              <button 
+                onClick={() => setPayModalId(null)}
+                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 flex flex-col items-center">
+              <div className="mb-4 text-center">
+                <p className="text-sm text-gray-500 mb-1">Total Tagihan</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatPrice(
+                    reservations.find(r => r.id === payModalId)?.paymentType === "DP" 
+                      ? (reservations.find(r => r.id === payModalId)?.totalPrice || 0) / 2
+                      : (reservations.find(r => r.id === payModalId)?.totalPrice || 0)
+                  )}
+                </p>
+                <p className="text-xs font-medium text-blue-600 mt-1 bg-blue-50 py-1 px-2 rounded-full inline-block">
+                  {reservations.find(r => r.id === payModalId)?.paymentType === "DP" ? "DP 50%" : "Lunas 100%"}
+                </p>
+              </div>
+              <div className="bg-white p-3 border-2 border-gray-100 rounded-xl shadow-inner">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
+                    typeof window !== 'undefined' ? `${window.location.origin}/pay/${payModalId}` : ''
+                  )}`} 
+                  alt="QR Code Pembayaran" 
+                  className="w-48 h-48 object-contain"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-4 text-center">
+                Buka aplikasi E-Wallet (GoPay, OVO, Dana) atau m-Banking Anda, lalu scan QR Code ini.
+              </p>
+            </div>
+            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-center">
+               <p className="text-xs text-gray-400">Atau scan pakai kamera HP (Untuk Demo Sidang)</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

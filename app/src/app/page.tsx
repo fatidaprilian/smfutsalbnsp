@@ -71,8 +71,15 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {courts.map((court) => {
-              const totalSlots = court.slots.length;
-              const availableSlots = court.slots.filter(s => s.available).length;
+              const currentHour = new Date().getHours();
+              const validSlots = court.slots.map(s => ({
+                ...s,
+                isPast: s.hour <= currentHour,
+                effectivelyAvailable: s.available && s.hour > currentHour
+              }));
+
+              const totalSlots = validSlots.length;
+              const availableSlots = validSlots.filter(s => s.effectivelyAvailable).length;
               
               return (
                 <div key={court.id} className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-zinc-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all">
@@ -93,15 +100,15 @@ export default async function Home() {
                   
                   <div className="mt-4">
                     <div className="grid grid-cols-4 gap-2 mb-4">
-                      {court.slots.map((s, idx) => (
+                      {validSlots.map((s, idx) => (
                         <div 
                           key={idx} 
                           className={`text-center py-2 rounded-lg text-xs font-bold border transition-colors ${
-                            s.available 
+                            s.effectivelyAvailable 
                               ? 'bg-white border-zinc-200 text-zinc-900 hover:border-zinc-900 cursor-default' 
                               : 'bg-zinc-50 border-transparent text-zinc-400 line-through'
                           }`}
-                          title={s.available ? 'Tersedia' : 'Penuh'}
+                          title={s.effectivelyAvailable ? 'Tersedia' : s.isPast ? 'Lewat' : 'Penuh'}
                         >
                           {String(s.hour).padStart(2, '0')}:00
                         </div>

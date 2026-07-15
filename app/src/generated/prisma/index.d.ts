@@ -50,7 +50,9 @@ export type CourtType = (typeof CourtType)[keyof typeof CourtType]
 
 
 export const ReservationStatus: {
+  PENDING: 'PENDING',
   CONFIRMED: 'CONFIRMED',
+  COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED'
 };
 
@@ -3366,6 +3368,7 @@ export namespace Prisma {
     startHour: number | null
     endHour: number | null
     totalPrice: number | null
+    paymentType: string | null
     status: $Enums.ReservationStatus | null
     createdAt: Date | null
   }
@@ -3378,6 +3381,7 @@ export namespace Prisma {
     startHour: number | null
     endHour: number | null
     totalPrice: number | null
+    paymentType: string | null
     status: $Enums.ReservationStatus | null
     createdAt: Date | null
   }
@@ -3390,6 +3394,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType: number
     status: number
     createdAt: number
     _all: number
@@ -3416,6 +3421,7 @@ export namespace Prisma {
     startHour?: true
     endHour?: true
     totalPrice?: true
+    paymentType?: true
     status?: true
     createdAt?: true
   }
@@ -3428,6 +3434,7 @@ export namespace Prisma {
     startHour?: true
     endHour?: true
     totalPrice?: true
+    paymentType?: true
     status?: true
     createdAt?: true
   }
@@ -3440,6 +3447,7 @@ export namespace Prisma {
     startHour?: true
     endHour?: true
     totalPrice?: true
+    paymentType?: true
     status?: true
     createdAt?: true
     _all?: true
@@ -3539,6 +3547,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType: string
     status: $Enums.ReservationStatus
     createdAt: Date
     _count: ReservationCountAggregateOutputType | null
@@ -3570,6 +3579,7 @@ export namespace Prisma {
     startHour?: boolean
     endHour?: boolean
     totalPrice?: boolean
+    paymentType?: boolean
     status?: boolean
     createdAt?: boolean
     court?: boolean | CourtDefaultArgs<ExtArgs>
@@ -3584,6 +3594,7 @@ export namespace Prisma {
     startHour?: boolean
     endHour?: boolean
     totalPrice?: boolean
+    paymentType?: boolean
     status?: boolean
     createdAt?: boolean
     court?: boolean | CourtDefaultArgs<ExtArgs>
@@ -3598,6 +3609,7 @@ export namespace Prisma {
     startHour?: boolean
     endHour?: boolean
     totalPrice?: boolean
+    paymentType?: boolean
     status?: boolean
     createdAt?: boolean
     court?: boolean | CourtDefaultArgs<ExtArgs>
@@ -3612,11 +3624,12 @@ export namespace Prisma {
     startHour?: boolean
     endHour?: boolean
     totalPrice?: boolean
+    paymentType?: boolean
     status?: boolean
     createdAt?: boolean
   }
 
-  export type ReservationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "courtId" | "userId" | "date" | "startHour" | "endHour" | "totalPrice" | "status" | "createdAt", ExtArgs["result"]["reservation"]>
+  export type ReservationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "courtId" | "userId" | "date" | "startHour" | "endHour" | "totalPrice" | "paymentType" | "status" | "createdAt", ExtArgs["result"]["reservation"]>
   export type ReservationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     court?: boolean | CourtDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3644,6 +3657,7 @@ export namespace Prisma {
       startHour: number
       endHour: number
       totalPrice: number
+      paymentType: string
       status: $Enums.ReservationStatus
       createdAt: Date
     }, ExtArgs["result"]["reservation"]>
@@ -4078,6 +4092,7 @@ export namespace Prisma {
     readonly startHour: FieldRef<"Reservation", 'Int'>
     readonly endHour: FieldRef<"Reservation", 'Int'>
     readonly totalPrice: FieldRef<"Reservation", 'Int'>
+    readonly paymentType: FieldRef<"Reservation", 'String'>
     readonly status: FieldRef<"Reservation", 'ReservationStatus'>
     readonly createdAt: FieldRef<"Reservation", 'DateTime'>
   }
@@ -4543,6 +4558,7 @@ export namespace Prisma {
     startHour: 'startHour',
     endHour: 'endHour',
     totalPrice: 'totalPrice',
+    paymentType: 'paymentType',
     status: 'status',
     createdAt: 'createdAt'
   };
@@ -4795,6 +4811,7 @@ export namespace Prisma {
     startHour?: IntFilter<"Reservation"> | number
     endHour?: IntFilter<"Reservation"> | number
     totalPrice?: IntFilter<"Reservation"> | number
+    paymentType?: StringFilter<"Reservation"> | string
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
     createdAt?: DateTimeFilter<"Reservation"> | Date | string
     court?: XOR<CourtScalarRelationFilter, CourtWhereInput>
@@ -4809,6 +4826,7 @@ export namespace Prisma {
     startHour?: SortOrder
     endHour?: SortOrder
     totalPrice?: SortOrder
+    paymentType?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     court?: CourtOrderByWithRelationInput
@@ -4826,6 +4844,7 @@ export namespace Prisma {
     startHour?: IntFilter<"Reservation"> | number
     endHour?: IntFilter<"Reservation"> | number
     totalPrice?: IntFilter<"Reservation"> | number
+    paymentType?: StringFilter<"Reservation"> | string
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
     createdAt?: DateTimeFilter<"Reservation"> | Date | string
     court?: XOR<CourtScalarRelationFilter, CourtWhereInput>
@@ -4840,6 +4859,7 @@ export namespace Prisma {
     startHour?: SortOrder
     endHour?: SortOrder
     totalPrice?: SortOrder
+    paymentType?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     _count?: ReservationCountOrderByAggregateInput
@@ -4860,6 +4880,7 @@ export namespace Prisma {
     startHour?: IntWithAggregatesFilter<"Reservation"> | number
     endHour?: IntWithAggregatesFilter<"Reservation"> | number
     totalPrice?: IntWithAggregatesFilter<"Reservation"> | number
+    paymentType?: StringWithAggregatesFilter<"Reservation"> | string
     status?: EnumReservationStatusWithAggregatesFilter<"Reservation"> | $Enums.ReservationStatus
     createdAt?: DateTimeWithAggregatesFilter<"Reservation"> | Date | string
   }
@@ -4990,6 +5011,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
     court: CourtCreateNestedOneWithoutReservationsInput
@@ -5004,6 +5026,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
   }
@@ -5014,6 +5037,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     court?: CourtUpdateOneRequiredWithoutReservationsNestedInput
@@ -5028,6 +5052,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5040,6 +5065,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
   }
@@ -5050,6 +5076,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5062,6 +5089,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5276,6 +5304,7 @@ export namespace Prisma {
     startHour?: SortOrder
     endHour?: SortOrder
     totalPrice?: SortOrder
+    paymentType?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
   }
@@ -5294,6 +5323,7 @@ export namespace Prisma {
     startHour?: SortOrder
     endHour?: SortOrder
     totalPrice?: SortOrder
+    paymentType?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
   }
@@ -5306,6 +5336,7 @@ export namespace Prisma {
     startHour?: SortOrder
     endHour?: SortOrder
     totalPrice?: SortOrder
+    paymentType?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
   }
@@ -5617,6 +5648,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
     court: CourtCreateNestedOneWithoutReservationsInput
@@ -5629,6 +5661,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
   }
@@ -5670,6 +5703,7 @@ export namespace Prisma {
     startHour?: IntFilter<"Reservation"> | number
     endHour?: IntFilter<"Reservation"> | number
     totalPrice?: IntFilter<"Reservation"> | number
+    paymentType?: StringFilter<"Reservation"> | string
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
     createdAt?: DateTimeFilter<"Reservation"> | Date | string
   }
@@ -5680,6 +5714,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutReservationsInput
@@ -5692,6 +5727,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
   }
@@ -5825,6 +5861,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
   }
@@ -5835,6 +5872,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     court?: CourtUpdateOneRequiredWithoutReservationsNestedInput
@@ -5847,6 +5885,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5858,6 +5897,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5869,6 +5909,7 @@ export namespace Prisma {
     startHour: number
     endHour: number
     totalPrice: number
+    paymentType?: string
     status?: $Enums.ReservationStatus
     createdAt?: Date | string
   }
@@ -5879,6 +5920,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutReservationsNestedInput
@@ -5891,6 +5933,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5902,6 +5945,7 @@ export namespace Prisma {
     startHour?: IntFieldUpdateOperationsInput | number
     endHour?: IntFieldUpdateOperationsInput | number
     totalPrice?: IntFieldUpdateOperationsInput | number
+    paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

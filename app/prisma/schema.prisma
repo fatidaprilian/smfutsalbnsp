@@ -45,13 +45,16 @@ model Reservation {
   startHour  Int
   endHour    Int
   totalPrice Int
-  status     ReservationStatus @default(CONFIRMED)
+  paymentType String            @default("DP") // "DP" or "FULL"
+  status     ReservationStatus @default(PENDING)
   createdAt  DateTime          @default(now())
 
   @@index([courtId, date, status])
 }
 
 enum ReservationStatus {
+  PENDING
   CONFIRMED
+  COMPLETED
   CANCELLED
 }

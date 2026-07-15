@@ -138,7 +138,16 @@ app/
 
 ---
 
-## 4. Fitur Real-Time (Polling)
+## 4. Hak Akses Istimewa Admin (Offline/Walk-in)
+
+Selain pelanggan, **Admin** juga dilengkapi kewenangan penuh untuk memanipulasi jadwal melalui *dashboard* admin:
+- **Buat Reservasi (Walk-in)**: Admin dapat memasukkan data penyewaan pelanggan yang datang langsung (tanpa aplikasi). Reservasi ini akan terdata atas nama Admin.
+- **Edit Reservasi**: Admin dapat mengedit detail (tanggal, jam, lapangan) dari reservasi yang sudah ada untuk mengakomodir kesalahan atau perpindahan jadwal pelanggan.
+- **Kisi-Kisi Ketersediaan**: Admin memiliki akses langsung ke ketersediaan lapangan (Tersedia/Terisi) sama seperti pelanggan.
+
+---
+
+## 5. Fitur Real-Time (Polling)
 
 Sistem menggunakan teknik *polling* (menarik data secara berkala) untuk menciptakan pengalaman *real-time* tanpa WebSocket (demi menghemat biaya *serverless*):
 1. **Ketersediaan Lapangan & Daftar Reservasi**: Menggunakan `router.refresh()` setiap 10 detik agar tampilan kisi-kisi jam dan tabel admin selalu terbarui jika ada pengguna lain yang mem-booking.

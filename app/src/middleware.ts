@@ -45,15 +45,16 @@ export async function middleware(request: NextRequest) {
   const isPublicPath =
     pathname === "/" ||
     pathname.startsWith("/login") ||
-    pathname.startsWith("/register");
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/pay");
 
   // Not logged in → redirect to login (except public paths)
   if (!session && !isPublicPath) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Logged in → redirect away from login/register
-  if (session && isPublicPath) {
+  // Logged in → redirect away from login/register (but allow /pay)
+  if (session && isPublicPath && !pathname.startsWith("/pay")) {
     const dest =
       session.role === "ADMIN" ? "/admin/reservations" : "/reservations";
     return NextResponse.redirect(new URL(dest, request.url));

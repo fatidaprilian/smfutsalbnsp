@@ -98,7 +98,7 @@ export function PayClient({ reservation }: { reservation: any }) {
       </button>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        (Simulasi Demo Pembayaran Lintas Perangkat)
+        Pembayaran Aman & Terverifikasi
       </p>
     </div>
   );

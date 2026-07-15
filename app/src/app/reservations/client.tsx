@@ -407,7 +407,7 @@ export function CustomerReservationClient({
               </p>
             </div>
             <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-center">
-               <p className="text-xs text-gray-400">Atau scan pakai kamera HP (Untuk Demo Sidang)</p>
+               <p className="text-xs text-gray-400">Atau scan pakai kamera HP</p>
             </div>
           </div>
         </div>

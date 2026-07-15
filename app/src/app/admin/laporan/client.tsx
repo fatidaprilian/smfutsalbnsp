@@ -45,10 +45,14 @@ export function LaporanClient({ courts }: { courts: Court[] }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Laporan Penggunaan Lapangan</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6 print:text-center print:text-3xl print:mb-8">Laporan Penggunaan Lapangan</h1>
+      <div className="hidden print:block mb-6 text-center text-gray-600">
+        <p>Periode: {new Date(startDate).toLocaleDateString("id-ID")} - {new Date(endDate).toLocaleDateString("id-ID")}</p>
+        <p>Dicetak pada: {new Date().toLocaleString("id-ID")}</p>
+      </div>
 
       {/* Filter Form */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 print:hidden">
         <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
@@ -114,6 +118,19 @@ export function LaporanClient({ courts }: { courts: Court[] }) {
       {data && (
         <>
           {/* Summary Cards */}
+          <div className="flex justify-between items-center mb-4 print:hidden">
+            <h2 className="text-xl font-bold text-gray-800">Ringkasan Laporan</h2>
+            <button
+              onClick={() => window.print()}
+              className="py-2 px-4 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-sm flex gap-2 items-center cursor-pointer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+              </svg>
+              Cetak / Simpan PDF
+            </button>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <p className="text-sm text-gray-500 mb-1">Total Jam Terpakai</p>

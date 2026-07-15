@@ -7,58 +7,64 @@
 
 **Kasus:** Reservasi tetap tersimpan meskipun jadwal sudah terisi (double booking).
 
-**Skenario reproduksi:** Dua pengguna membuka halaman reservasi bersamaan, memilih lapangan dan slot waktu yang sama, lalu menekan tombol "Reservasi" hampir bersamaan. Kedua reservasi berhasil tersimpan — padahal seharusnya hanya satu yang boleh berhasil.
+**Cara masalah ini terjadi:** Dua pelanggan membuka halaman reservasi secara bersamaan, memilih lapangan dan jam yang sama, lalu menekan tombol "Reservasi" hampir di waktu yang sama. Kedua reservasi berhasil tersimpan — padahal hanya satu yang seharusnya berhasil.
 
-## 2. Investigasi Root Cause
+---
+
+## 2. Pencarian Penyebab Masalah
 
 ### 2.1 Analisis Kode Versi Awal
 
-Versi awal menggunakan `$transaction` tanpa isolation level eksplisit:
+Versi awal menyimpan reservasi menggunakan blok transaksi database tanpa pengaturan tingkat pengamanan secara eksplisit:
 
 ```typescript
-// VERSI BUGGY — default Read Committed
+// VERSI BERMASALAH — pengaturan standar (Read Committed)
 await prisma.$transaction(async (tx) => {
-  const hasConflict = await checkConflict(tx, courtId, date, startHour, endHour);
-  if (hasConflict) {
-    throw new Error("CONFLICT");
+  const adaBentrok = await cekBentrok(tx, courtId, tanggal, jamMulai, jamSelesai);
+  if (adaBentrok) {
+    throw new Error("BENTROK");
   }
   await tx.reservation.create({ data: { ... } });
 });
 ```
 
-### 2.2 Root Cause: Race Condition pada Read Committed
+### 2.2 Penyebab Utama: Dua Proses Berjalan Bersamaan
 
-PostgreSQL default isolation level adalah **Read Committed**. Pada level ini:
+Pengaturan standar database PostgreSQL adalah **Read Committed**. Pada pengaturan ini, setiap transaksi hanya bisa melihat data yang sudah selesai disimpan oleh transaksi lain. Akibatnya:
 
-1. **Transaksi A** menjalankan `checkConflict` → hasilnya: tidak ada konflik (slot kosong)
-2. **Transaksi B** menjalankan `checkConflict` → hasilnya: tidak ada konflik (slot kosong)
-   *(Transaksi A belum commit, jadi B tidak melihat data yang diinsert A)*
-3. **Transaksi A** melakukan `INSERT` → berhasil
-4. **Transaksi B** melakukan `INSERT` → berhasil juga → **DOUBLE BOOKING**
+1. **Transaksi A** memeriksa ketersediaan slot → hasilnya: slot kosong, tidak ada bentrok
+2. **Transaksi B** memeriksa ketersediaan slot → hasilnya: slot kosong, tidak ada bentrok
+   *(Transaksi A belum selesai menyimpan, jadi B tidak tahu ada pemesanan yang sedang berjalan)*
+3. **Transaksi A** menyimpan reservasi → berhasil
+4. **Transaksi B** menyimpan reservasi → berhasil juga → **DOUBLE BOOKING terjadi**
 
 ```
-Timeline:
-Transaksi A: |---SELECT (kosong)---INSERT---COMMIT---|
-Transaksi B:    |---SELECT (kosong)---INSERT---COMMIT---|
+Gambaran urutan waktu:
+Transaksi A: |---CEK (kosong)---SIMPAN---SELESAI---|
+Transaksi B:    |---CEK (kosong)---SIMPAN---SELESAI---|
                       ↑
-                      B tidak melihat insert A karena A belum commit
+                      B tidak melihat pemesanan A karena A belum selesai menyimpan
 ```
 
-### 2.3 Mengapa Ini Bug Nyata (Bukan Direkayasa)
+### 2.3 Mengapa Ini Bug Nyata, Bukan Rekayasa
 
-Pattern `SELECT → check → INSERT` di dalam Read Committed transaction adalah bug klasik yang dikenal sebagai **write skew anomaly**. Ini terjadi secara natural di aplikasi booking/reservasi — bukan edge case yang perlu direkayasa.
+Pola "cek dulu, lalu simpan" dalam satu blok transaksi standar adalah kesalahan umum yang sering terjadi pada sistem pemesanan/reservasi. Masalah ini tidak perlu disimulasikan secara khusus — bisa terjadi secara alami saat dua orang memesan di waktu yang hampir bersamaan.
 
-## 3. Solusi yang Diterapkan
+---
 
-### 3.1 Naikkan Isolation Level ke Serializable
+## 3. Perbaikan yang Diterapkan
+
+### 3.1 Gunakan Tingkat Pengamanan Transaksi yang Lebih Ketat
+
+Solusinya adalah menjalankan transaksi dengan pengaturan **Serializable** — database akan memastikan dua proses yang saling berkaitan tidak bisa berjalan bersamaan:
 
 ```typescript
-// VERSI FIX — Serializable isolation
+// VERSI SETELAH DIPERBAIKI — Serializable
 await prisma.$transaction(
   async (tx) => {
-    const hasConflict = await checkConflict(tx, courtId, date, startHour, endHour);
-    if (hasConflict) {
-      throw new Error("CONFLICT");
+    const adaBentrok = await cekBentrok(tx, courtId, tanggal, jamMulai, jamSelesai);
+    if (adaBentrok) {
+      throw new Error("BENTROK");
     }
     await tx.reservation.create({ data: { ... } });
   },
@@ -66,24 +72,24 @@ await prisma.$transaction(
 );
 ```
 
-### 3.2 Tambah Retry Logic untuk Error P2034
+### 3.2 Tambahkan Mekanisme Coba Ulang Otomatis
 
-Pada Serializable, PostgreSQL mendeteksi konflik dan meng-abort salah satu transaksi dengan error code `P2034` (Prisma) / `40001` (PostgreSQL). Aplikasi harus retry:
+Ketika dua transaksi bertabrakan, database akan membatalkan salah satunya dan memberikan kode error `P2034`. Agar pengguna tidak langsung melihat error, sistem mencoba ulang secara otomatis hingga 3 kali:
 
 ```typescript
-async function withSerializableRetry<T>(
+async function cobaUlangSerialisasi<T>(
   fn: () => Promise<T>,
-  maxRetries = 3
+  maksimalPercobaan = 3
 ): Promise<T> {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
+  for (let percobaan = 0; percobaan < maksimalPercobaan; percobaan++) {
     try {
       return await fn();
     } catch (error: unknown) {
-      const isPrismaConflict =
+      const adaTabrakan =
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2034";
-      if (isPrismaConflict && attempt < maxRetries - 1) {
-        continue; // retry
+      if (adaTabrakan && percobaan < maksimalPercobaan - 1) {
+        continue; // coba lagi
       }
       throw error;
     }
@@ -92,32 +98,36 @@ async function withSerializableRetry<T>(
 }
 ```
 
-### 3.3 Hasil Setelah Fix
+### 3.3 Hasil Setelah Diperbaiki
 
 ```
-Timeline setelah fix:
-Transaksi A: |---SELECT---INSERT---COMMIT---|
-Transaksi B:    |---SELECT---INSERT---ABORT (P2034)---RETRY---SELECT (ada data A)---REJECT---|
-                                                 ↑
-                                    PostgreSQL mendeteksi serialization failure
+Gambaran urutan waktu setelah perbaikan:
+Transaksi A: |---CEK---SIMPAN---SELESAI---|
+Transaksi B:    |---CEK---SIMPAN---DIBATALKAN (P2034)---COBA ULANG---CEK (ada data A)---TOLAK---|
+                                              ↑
+                               Database mendeteksi tabrakan dan membatalkan salah satu
 ```
 
-Hanya satu transaksi yang berhasil. Yang kedua mendapat pesan error "Jadwal bentrok!" dan bisa mencoba slot lain.
+Hanya satu transaksi yang berhasil. Transaksi kedua mendapat pesan "Jadwal bentrok!" dan pengguna bisa memilih slot lain.
+
+---
 
 ## 4. Verifikasi
 
-### Sebelum Fix (Read Committed)
-- 2 request paralel ke slot yang sama → **keduanya tersimpan** (GAGAL)
+### Sebelum Diperbaiki (Pengaturan Standar)
+- 2 permintaan bersamaan ke slot yang sama → **keduanya tersimpan** (GAGAL)
 
-### Setelah Fix (Serializable + Retry)
-- 2 request paralel ke slot yang sama → **hanya 1 yang berhasil**, yang lain mendapat error → di-retry → mendeteksi konflik → menampilkan pesan "Jadwal bentrok!" (BERHASIL)
+### Setelah Diperbaiki (Pengaturan Ketat + Coba Ulang)
+- 2 permintaan bersamaan ke slot yang sama → **hanya 1 yang berhasil**, yang lain mendapat error → sistem mencoba ulang → mendeteksi slot sudah terisi → menampilkan pesan "Jadwal bentrok!" (BERHASIL)
 
-## 5. Kesimpulan
+---
 
-| Item | Detail |
+## 5. Ringkasan Perbaikan
+
+| Item | Keterangan |
 |---|---|
-| **Bug** | Double booking karena race condition |
-| **Root Cause** | Read Committed isolation level tidak mencegah write skew |
-| **Fix** | Serializable isolation + retry logic (P2034) |
+| **Bug yang ditemukan** | Double booking akibat dua proses yang berjalan bersamaan |
+| **Penyebab** | Pengaturan transaksi standar tidak mencegah dua proses membaca data yang sama sebelum salah satu selesai menyimpan |
+| **Perbaikan** | Ganti ke pengaturan transaksi Serializable + tambahkan mekanisme coba ulang otomatis |
 | **File yang diubah** | `src/actions/reservation.ts` — fungsi `createReservation` dan `updateReservation` |
-| **Impact** | Zero double booking di bawah concurrent access |
+| **Dampak** | Tidak ada lagi double booking meskipun dua pengguna memesan di waktu yang sama |

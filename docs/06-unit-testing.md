@@ -3,67 +3,74 @@
 
 ---
 
-## 1. Framework dan Konfigurasi
+## 1. Alat dan Cara Menjalankan
 
-- **Framework:** Vitest 4.x
-- **Environment:** Node.js
-- **Perintah:** `npm test` atau `npx vitest run`
+- **Alat pengujian:** Vitest 4.x
+- **Cara menjalankan:** ketik `npm test` atau `npx vitest run` di terminal
 
-## 2. Data Uji
+---
 
-### Auth Test Data
+## 2. Data yang Digunakan untuk Pengujian
 
-| Data | Nilai |
-|---|---|
-| Password benar | `password123` |
-| Password salah | `wrongpassword` |
-| Hash (bcrypt, cost 10) | Dihasilkan oleh `hashSync("password123", 10)` |
-
-### Reservation Test Data
+### Data untuk Pengujian Login
 
 | Data | Nilai |
 |---|---|
-| Reservasi existing #1 | Jam 08:00–10:00, CONFIRMED |
-| Reservasi existing #2 | Jam 14:00–16:00, CONFIRMED |
-| Reservasi existing #3 | Jam 18:00–19:00, CANCELLED |
-| Price per hour | Rp200.000 |
+| Kata sandi yang benar | `password123` |
+| Kata sandi yang salah | `wrongpassword` |
+| Kata sandi terenkripsi (bcrypt) | Dibuat dari `hashSync("password123", 10)` |
 
-## 3. Skenario dan Hasil
+### Data untuk Pengujian Reservasi
 
-### 3.1 Auth Logic Test
+| Data | Nilai |
+|---|---|
+| Reservasi yang sudah ada #1 | Jam 08:00–10:00, status Aktif (CONFIRMED) |
+| Reservasi yang sudah ada #2 | Jam 14:00–16:00, status Aktif (CONFIRMED) |
+| Reservasi yang sudah ada #3 | Jam 18:00–19:00, status Dibatalkan (CANCELLED) |
+| Harga sewa per jam | Rp200.000 |
 
-| No | Skenario | Input | Expected | Actual | Status |
+---
+
+## 3. Skenario dan Hasil Pengujian
+
+### 3.1 Pengujian Login
+
+| No | Skenario | Data Masuk | Hasil yang Diharapkan | Hasil Aktual | Status |
 |---|---|---|---|---|---|
-| 1 | Login email + password benar | password: `password123`, hash: valid bcrypt | `true` (berhasil masuk) | `true` | PASS |
-| 2 | Login password salah | password: `wrongpassword`, hash: valid bcrypt | `false` (pesan error) | `false` | PASS |
+| 1 | Login dengan email dan kata sandi yang benar | Kata sandi: `password123`, hash: valid | Berhasil masuk (`true`) | `true` | LULUS |
+| 2 | Login dengan kata sandi yang salah | Kata sandi: `wrongpassword`, hash: valid | Gagal masuk (`false`) | `false` | LULUS |
 
-### 3.2 Reservation Logic Test
+### 3.2 Pengujian Reservasi
 
-| No | Skenario | Input | Expected | Actual | Status |
+| No | Skenario | Data Masuk | Hasil yang Diharapkan | Hasil Aktual | Status |
 |---|---|---|---|---|---|
-| 3 | Reservasi valid (slot kosong) | Jam 10:00–12:00 | Tidak ada konflik → data tersimpan | `hasConflict = false` | PASS |
-| 4 | Reservasi slot bentrok | Jam 09:00–11:00 (overlap dengan 08:00–10:00) | Konflik terdeteksi | `hasConflict = true` | PASS |
-| 5 | Booking slot yang sudah di-cancel | Jam 18:00–19:00 (slot CANCELLED) | Tidak ada konflik | `hasConflict = false` | PASS |
-| 6 | Overlap persis (exact match) | Jam 08:00–10:00 (sama dengan existing) | Konflik terdeteksi | `hasConflict = true` | PASS |
-| 7 | Slot adjacent (bersebelahan) | Jam 10:00–14:00 (mulai tepat setelah 08:00–10:00) | Tidak ada konflik | `hasConflict = false` | PASS |
-| 8 | Kalkulasi harga | 2 jam × Rp200.000 | Rp400.000 | `400000` | PASS |
+| 3 | Reservasi di slot yang masih kosong | Jam 10:00–12:00 | Tidak ada bentrok → data bisa disimpan | `adaBentrok = false` | LULUS |
+| 4 | Reservasi di slot yang bertabrakan | Jam 09:00–11:00 (bertabrakan dengan 08:00–10:00) | Bentrok terdeteksi | `adaBentrok = true` | LULUS |
+| 5 | Memesan slot yang sebelumnya dibatalkan | Jam 18:00–19:00 (slot dengan status CANCELLED) | Tidak ada bentrok (boleh dipesan ulang) | `adaBentrok = false` | LULUS |
+| 6 | Memesan di jam yang persis sama | Jam 08:00–10:00 (sama persis dengan yang sudah ada) | Bentrok terdeteksi | `adaBentrok = true` | LULUS |
+| 7 | Memesan slot yang bersebelahan | Jam 10:00–14:00 (langsung setelah 08:00–10:00) | Tidak ada bentrok | `adaBentrok = false` | LULUS |
+| 8 | Kalkulasi total harga | Durasi 2 jam × Rp200.000 | Rp400.000 | `400000` | LULUS |
 
-## 4. Output Test
+---
+
+## 4. Output Hasil Pengujian
 
 ```
- ✓ src/__tests__/auth.test.ts (2 tests) 145ms
- ✓ src/__tests__/reservation.test.ts (6 tests) 4ms
+ ✓ src/__tests__/auth.test.ts (2 pengujian) 145ms
+ ✓ src/__tests__/reservation.test.ts (6 pengujian) 4ms
 
- Test Files  2 passed (2)
-      Tests  8 passed (8)
-   Start at  14:55:14
-   Duration  410ms
+ File Uji   2 lulus (2)
+ Pengujian  8 lulus (8)
+ Dimulai    14:55:14
+ Durasi     410ms
 ```
+
+---
 
 ## 5. Kesimpulan
 
-Semua 8 skenario pengujian berhasil (PASS). Pengujian mencakup:
-- **Happy path:** Login benar, reservasi slot kosong
-- **Error path:** Login salah, reservasi slot bentrok
-- **Edge case:** Slot cancelled bisa di-booking ulang, slot adjacent tidak konflik
-- **Kalkulasi:** Harga dihitung dengan benar
+Seluruh 8 skenario pengujian berhasil (LULUS). Pengujian mencakup:
+- **Alur normal:** Login benar, reservasi di slot kosong
+- **Alur kesalahan:** Login dengan kata sandi salah, reservasi di slot yang sudah terisi
+- **Kasus batas:** Slot yang dibatalkan bisa dipesan kembali; slot yang bersebelahan tidak dianggap bentrok
+- **Kalkulasi:** Harga dihitung dengan benar sesuai durasi

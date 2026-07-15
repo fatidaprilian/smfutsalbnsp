@@ -3,71 +3,81 @@
 
 ---
 
-## 1. Metodologi
+## 1. Cara Pengukuran
 
-Pengukuran performa dilakukan menggunakan `console.time` / `performance.now()` pada server actions di environment development (`npm run dev`). Setiap operasi diukur 3 kali dan diambil rata-rata.
+Pengukuran kecepatan dilakukan menggunakan perintah `console.time` / `performance.now()` yang ditambahkan secara langsung pada setiap proses di server. Pengukuran dijalankan di mode pengembangan (`npm run dev`). Setiap operasi diukur sebanyak 3 kali dan hasilnya diambil rata-rata.
 
-**Environment:**
-- Next.js 16 (Turbopack) — development mode
-- PostgreSQL (Neon) — serverless
-- Data: 5 lapangan, 6 users, ~5 reservasi
+**Kondisi saat pengukuran:**
+- Next.js 16 (mode pengembangan)
+- PostgreSQL (Neon) — layanan database berbasis cloud
+- Data uji: 5 lapangan, 6 pengguna, ~5 reservasi
 
-## 2. Hasil Pengukuran
+---
 
-| No | Operasi | Waktu Rata-rata | Target | Status |
+## 2. Hasil Pengukuran Kecepatan
+
+| No | Operasi | Waktu Rata-rata | Batas Waktu | Hasil |
 |---|---|---|---|---|
-| 1 | Login (bcrypt verify) | ~150-300ms | < 2s | PASS |
-| 2 | Register (bcrypt hash + insert) | ~200-400ms | < 2s | PASS |
-| 3 | Load ketersediaan (`getAvailableSlots`) | ~50-100ms | < 2s | PASS |
-| 4 | Buat reservasi (`createReservation`) | ~100-200ms | < 2s | PASS |
-| 5 | Update reservasi (`updateReservation`) | ~100-200ms | < 2s | PASS |
-| 6 | Cancel reservasi (`cancelReservation`) | ~30-80ms | < 2s | PASS |
-| 7 | Cari reservasi (`searchReservations`) | ~50-100ms | < 2s | PASS |
-| 8 | Load laporan (`getLaporanPenggunaan`) | ~50-150ms | < 2s | PASS |
+| 1 | Login (cocokkan kata sandi) | ~150–300ms | < 2 detik | LULUS |
+| 2 | Daftar akun (enkripsi kata sandi + simpan) | ~200–400ms | < 2 detik | LULUS |
+| 3 | Muat ketersediaan lapangan | ~50–100ms | < 2 detik | LULUS |
+| 4 | Buat reservasi baru | ~100–200ms | < 2 detik | LULUS |
+| 5 | Ubah reservasi | ~100–200ms | < 2 detik | LULUS |
+| 6 | Batalkan reservasi | ~30–80ms | < 2 detik | LULUS |
+| 7 | Cari reservasi | ~50–100ms | < 2 detik | LULUS |
+| 8 | Muat laporan | ~50–150ms | < 2 detik | LULUS |
 
-## 3. Identifikasi Fungsi yang Relatif Lambat
+---
 
-### 3.1 Login & Register — bcrypt hashing (~150-400ms)
+## 3. Identifikasi Fungsi yang Relatif Lebih Lambat
 
-**Penyebab:** bcrypt dirancang untuk intentionally slow (cost factor 10 = ~100ms per operasi). Ini adalah fitur keamanan, bukan bug.
+### 3.1 Login dan Daftar Akun — Enkripsi Kata Sandi (~150–400ms)
 
-**Rekomendasi:** Tidak perlu dioptimasi — trade-off keamanan yang tepat. Jika perlu lebih cepat, gunakan Argon2 yang bisa dikonfigurasi lebih granular, tapi bcrypt sudah memadai untuk skala ini.
+**Penyebab:** Proses enkripsi kata sandi memang dirancang untuk berjalan lambat secara sengaja. Ini adalah fitur keamanan — semakin lama proses enkripsi, semakin sulit ditebak oleh pihak yang tidak bertanggung jawab.
 
-### 3.2 Reservasi dengan Serializable Transaction (~100-200ms)
+**Rekomendasi:** Tidak perlu diubah. Waktu 150–400ms masih jauh di bawah batas 2 detik dan merupakan pertukaran yang wajar demi keamanan. Jika suatu saat perlu disesuaikan, bisa mempertimbangkan algoritma lain seperti Argon2, namun bcrypt sudah cukup untuk skala sistem ini.
 
-**Penyebab:** Serializable isolation level menambah overhead karena PostgreSQL harus melacak dependency antar transaksi. Ditambah retry logic saat konflik.
+### 3.2 Buat dan Ubah Reservasi — Transaksi Terkunci (~100–200ms)
 
-**Rekomendasi:** Overhead ini diperlukan untuk mencegah double booking. Bisa dimitigasi dengan:
-- Menjaga transaksi sesingkat mungkin (sudah dilakukan — hanya SELECT + INSERT)
-- Retry maximum 3 kali (sudah dilakukan)
+**Penyebab:** Proses penyimpanan reservasi menggunakan pengaturan transaksi yang lebih ketat (*Serializable*) untuk mencegah double booking. Pengaturan ini menambahkan sedikit waktu ekstra karena database perlu melacak hubungan antar proses yang berjalan bersamaan.
 
-### 3.3 Query Laporan — Potensi Lambat di Data Besar
+**Rekomendasi:** Waktu tambahan ini tidak bisa dihindari dan memang diperlukan. Yang sudah dilakukan untuk meminimalkannya: proses dalam transaksi dibuat sesingkat mungkin (hanya cek bentrok + simpan data), dan batas percobaan ulang dibatasi maksimal 3 kali.
 
-**Penyebab saat ini:** Cepat karena data masih sedikit (~5 record). Tapi query aggregasi (`findMany` + loop di application code) akan melambat saat data > 10.000 record.
+### 3.3 Laporan — Berpotensi Lambat saat Data Besar
+
+**Kondisi saat ini:** Cepat karena data masih sedikit (~5 record). Namun, cara pengambilan data laporan saat ini dilakukan dengan mengambil semua data lalu menghitungnya di sisi aplikasi — bukan di sisi database.
+
+**Potensi masalah:** Saat jumlah reservasi sudah mencapai ribuan, proses ini bisa mulai terasa lambat.
 
 **Rekomendasi:**
-1. Gunakan database-level aggregation (`GROUP BY`) alih-alih application-level loop — ini bisa dilakukan dengan Prisma `groupBy` atau raw query
-2. Tambah index pada kolom `date` jika sering filter by date range
-3. Implementasi pagination jika daftar reservasi terlalu panjang
+1. Gunakan kemampuan penghitungan bawaan database (`GROUP BY`) agar ringkasan dihitung langsung di database, bukan di aplikasi
+2. Tambahkan indeks pada kolom tanggal jika laporan sering difilter berdasarkan rentang tanggal
+3. Tambahkan pembagian halaman agar daftar reservasi tidak dimuat semuanya sekaligus
 
-## 4. Code Review — Temuan
+---
 
-| No | File | Temuan | Severity |
+## 4. Hasil Code Review — Temuan
+
+| No | File | Temuan | Tingkat Risiko |
 |---|---|---|---|
-| 1 | `actions/reservation.ts` | `searchReservations` menggunakan `take: 100` sebagai hard limit — sudah baik untuk mencegah unbounded query | Info |
-| 2 | `actions/laporan.ts` | Aggregasi dilakukan di application code, bukan SQL — bisa jadi bottleneck di data besar | Low |
-| 3 | `lib/prisma.ts` | Singleton pattern mencegah connection exhaustion di dev hot reload — sudah benar | Info |
-| 4 | `middleware.ts` | JWT verification di setiap request — lightweight karena HS256 pure CPU, no DB roundtrip | Info |
+| 1 | `actions/reservation.ts` | Pencarian reservasi dibatasi maksimal 100 data — mencegah sistem memuat terlalu banyak sekaligus | Informasi |
+| 2 | `actions/laporan.ts` | Penghitungan laporan dilakukan di sisi aplikasi, bukan di database — bisa jadi masalah saat data besar | Rendah |
+| 3 | `lib/prisma.ts` | Koneksi ke database dibuat satu kali dan dipakai bersama — sudah benar, mencegah pembuatan koneksi berlebihan | Informasi |
+| 4 | `middleware.ts` | Pemeriksaan sesi login dilakukan setiap ada permintaan halaman — ringan karena hanya membaca token, tidak perlu akses ke database | Informasi |
+
+---
 
 ## 5. Rekomendasi Perbaikan
 
-| No | Rekomendasi | Prioritas | Effort |
+| No | Rekomendasi | Prioritas | Tingkat Kesulitan |
 |---|---|---|---|
-| 1 | Ganti application-level aggregation di laporan dengan `prisma.$queryRaw` atau `groupBy` | Sedang | Rendah |
-| 2 | Tambah pagination pada `searchReservations` (offset/cursor-based) | Sedang | Rendah |
-| 3 | Monitor actual query time di production dengan Prisma logging (`log: ['query']`) | Rendah | Rendah |
-| 4 | Tambah index pada `Reservation.date` jika query laporan sering scan by date range | Rendah | Rendah |
+| 1 | Pindahkan penghitungan laporan ke sisi database menggunakan `groupBy` atau query mentah | Sedang | Rendah |
+| 2 | Tambahkan pembagian halaman pada pencarian reservasi | Sedang | Rendah |
+| 3 | Aktifkan pencatatan waktu query di production untuk pemantauan berkelanjutan | Rendah | Rendah |
+| 4 | Tambahkan indeks pada kolom `tanggal` jika laporan sering difilter berdasarkan rentang tanggal | Rendah | Rendah |
+
+---
 
 ## 6. Kesimpulan
 
-Semua operasi saat ini berada di bawah target 2 detik. Bottleneck utama yang potensial di masa depan adalah query laporan pada data besar. Rekomendasi difokuskan pada optimasi query aggregation dan pagination.
+Semua operasi yang diuji berjalan di bawah batas 2 detik. Tidak ada fungsi yang saat ini menjadi masalah nyata. Potensi perlambatan di masa depan yang paling perlu diantisipasi adalah penghitungan laporan saat volume data sudah sangat besar. Rekomendasi perbaikan difokuskan pada area tersebut.

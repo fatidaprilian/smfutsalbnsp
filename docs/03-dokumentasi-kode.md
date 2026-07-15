@@ -5,132 +5,145 @@
 
 ## 1. Struktur Database
 
-Sistem menggunakan 3 tabel utama pada PostgreSQL:
+Sistem menggunakan 3 tabel utama di dalam database PostgreSQL:
 
-| Tabel | Deskripsi | Relasi |
+| Tabel | Keterangan | Hubungan |
 |---|---|---|
-| `User` | Data pengguna (admin dan customer) | 1:N ke Reservation |
-| `Court` | Data lapangan (futsal/badminton) | 1:N ke Reservation |
-| `Reservation` | Data reservasi | N:1 ke User, N:1 ke Court |
+| `User` | Menyimpan data pengguna (admin dan pelanggan) | Satu pengguna bisa memiliki banyak reservasi |
+| `Court` | Menyimpan data lapangan (futsal/badminton) | Satu lapangan bisa memiliki banyak reservasi |
+| `Reservation` | Menyimpan data reservasi | Setiap reservasi terhubung ke satu pengguna dan satu lapangan |
 
-Detail lengkap skema ada di dokumen ERD & SQL Script.
+Detail lengkap kolom dan hubungan antar tabel tersedia di dokumen ERD & SQL Script.
 
-## 2. Struktur Modul
+---
+
+## 2. Struktur Folder Proyek
 
 ```
 app/
 ├── prisma/
-│   ├── schema.prisma          # Definisi tabel database
-│   └── seed.ts                # Data awal (courts, users, reservations)
-├── prisma.config.ts           # Konfigurasi Prisma 7
+│   ├── schema.prisma          # Definisi struktur tabel database
+│   └── seed.ts                # Data awal (lapangan, pengguna, reservasi contoh)
+├── prisma.config.ts           # Pengaturan koneksi Prisma ke database
 ├── src/
-│   ├── generated/prisma/      # Prisma Client (auto-generated)
+│   ├── generated/prisma/      # Kode akses database yang dibuat otomatis oleh Prisma
 │   ├── lib/
-│   │   ├── prisma.ts          # Singleton database connection
-│   │   ├── auth.ts            # Hash password, session JWT, cookie management
-│   │   └── validations.ts     # Schema validasi Zod untuk semua input
+│   │   ├── prisma.ts          # Pengaturan koneksi database (satu koneksi dibagi bersama)
+│   │   ├── auth.ts            # Fungsi enkripsi kata sandi, buat sesi login, kelola cookie
+│   │   └── validations.ts     # Aturan validasi untuk semua input dari pengguna
 │   ├── actions/
-│   │   ├── auth.ts            # Server actions: register, login, logout
-│   │   ├── reservation.ts     # Server actions: CRUD reservasi + conflict check
-│   │   └── laporan.ts         # Server action: laporan penggunaan lapangan
+│   │   ├── auth.ts            # Proses: daftar akun, login, logout
+│   │   ├── reservation.ts     # Proses: tambah/ubah/batalkan/cari reservasi + cek jadwal bentrok
+│   │   └── laporan.ts         # Proses: mengambil data laporan penggunaan lapangan
 │   ├── components/
-│   │   └── navbar.tsx         # Navigasi dengan link conditional per role
-│   ├── middleware.ts          # Route protection & redirect
+│   │   └── navbar.tsx         # Navigasi atas (menu berbeda untuk admin dan customer)
+│   ├── middleware.ts           # Pengaman halaman: arahkan pengguna ke halaman yang sesuai
 │   ├── app/
-│   │   ├── layout.tsx         # Root layout
-│   │   ├── page.tsx           # Redirect ke halaman sesuai role
+│   │   ├── layout.tsx         # Tampilan dasar yang dipakai semua halaman
+│   │   ├── page.tsx           # Halaman utama (langsung diarahkan sesuai peran pengguna)
 │   │   ├── login/page.tsx     # Halaman login
-│   │   ├── register/page.tsx  # Halaman register customer
+│   │   ├── register/page.tsx  # Halaman daftar akun (khusus pelanggan)
 │   │   ├── reservations/
-│   │   │   ├── page.tsx       # Server component: fetch data
-│   │   │   └── client.tsx     # Client component: UI interaktif
+│   │   │   ├── page.tsx       # Ambil data reservasi dari server
+│   │   │   └── client.tsx     # Tampilan interaktif untuk pelanggan
 │   │   └── admin/
 │   │       ├── reservations/
-│   │       │   ├── page.tsx   # Server component: fetch data
-│   │       │   └── client.tsx # Client component: filter & cancel
+│   │       │   ├── page.tsx   # Ambil semua data reservasi dari server
+│   │       │   └── client.tsx # Tampilan dengan filter dan tombol batalkan (admin)
 │   │       └── laporan/
-│   │           ├── page.tsx   # Server component: fetch courts
-│   │           └── client.tsx # Client component: form & tabel laporan
+│   │           ├── page.tsx   # Ambil daftar lapangan dari server
+│   │           └── client.tsx # Tampilan form laporan dan tabel hasil
 │   └── __tests__/
-│       ├── auth.test.ts       # Unit test: login logic
-│       └── reservation.test.ts # Unit test: conflict & price logic
-└── vitest.config.ts           # Konfigurasi Vitest
+│       ├── auth.test.ts       # Pengujian unit: logika login
+│       └── reservation.test.ts # Pengujian unit: cek bentrok jadwal dan kalkulasi harga
+└── vitest.config.ts           # Pengaturan alat pengujian otomatis (Vitest)
 ```
 
-## 3. Deskripsi Fungsi per Modul
+---
 
-### 3.1 `lib/auth.ts` — Modul Autentikasi
+## 3. Deskripsi Fungsi per Bagian
 
-| Fungsi | Deskripsi |
+### 3.1 `lib/auth.ts` — Bagian Keamanan Akun
+
+| Nama Fungsi | Penjelasan |
 |---|---|
-| `hashPassword(password)` | Hash password menggunakan bcrypt (cost factor 10) |
-| `verifyPassword(password, hash)` | Bandingkan password plaintext dengan hash bcrypt |
-| `createSession(userId, role)` | Buat JWT token (HS256, expire 24 jam), simpan di HttpOnly cookie `__Host-session` |
-| `getSession()` | Baca dan verifikasi JWT dari cookie, return `{userId, role}` atau null |
-| `destroySession()` | Hapus session cookie |
+| `hashPassword(password)` | Mengubah kata sandi menjadi teks terenkripsi menggunakan bcrypt sebelum disimpan ke database |
+| `verifyPassword(password, hash)` | Membandingkan kata sandi yang diketik pengguna dengan kata sandi terenkripsi di database |
+| `createSession(userId, role)` | Membuat token sesi login yang berlaku selama 24 jam dan menyimpannya di cookie browser yang aman |
+| `getSession()` | Membaca token sesi dari cookie dan mengembalikan identitas pengguna (ID dan peran), atau `null` jika belum login |
+| `destroySession()` | Menghapus cookie sesi saat pengguna logout |
 
-### 3.2 `lib/validations.ts` — Schema Validasi
+### 3.2 `lib/validations.ts` — Aturan Validasi Input
 
-| Schema | Field | Validasi |
+| Nama Skema | Kolom yang Dicek | Aturan |
 |---|---|---|
-| `loginSchema` | email, password | Email valid, password min 8 char |
-| `registerSchema` | name, email, password | Nama min 1 char, email valid, password min 8 max 128 char |
-| `reservationSchema` | courtId, date, startHour, endHour | courtId non-empty, date valid, jam 8–22, endHour > startHour |
-| `searchReservationSchema` | query?, courtId?, date?, status? | Status enum CONFIRMED/CANCELLED |
-| `laporanSchema` | startDate, endDate, courtId? | Tanggal valid |
+| `loginSchema` | email, password | Email harus format yang valid, kata sandi minimal 8 karakter |
+| `registerSchema` | name, email, password | Nama wajib diisi, email valid, kata sandi antara 8–128 karakter |
+| `reservationSchema` | courtId, date, startHour, endHour | Lapangan wajib dipilih, tanggal valid, jam antara 08:00–22:00, jam selesai harus lebih besar dari jam mulai |
+| `searchReservationSchema` | query?, courtId?, date?, status? | Status hanya boleh CONFIRMED atau CANCELLED |
+| `laporanSchema` | startDate, endDate, courtId? | Kedua tanggal harus valid |
 
-### 3.3 `actions/auth.ts` — Server Actions Autentikasi
+### 3.3 `actions/auth.ts` — Proses Autentikasi
 
-| Action | Input | Proses | Output |
+| Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
-| `registerCustomer` | FormData (name, email, password) | Validasi Zod → cek email unik → hash bcrypt → insert User | Redirect ke /login |
-| `login` | FormData (email, password) | Validasi Zod → cari user → verify bcrypt → buat session → redirect by role | Redirect ke /reservations atau /admin/reservations |
-| `logout` | — | Hapus session cookie | Redirect ke /login |
+| `registerCustomer` | Nama, email, kata sandi | Periksa data → cek apakah email sudah terdaftar → enkripsi kata sandi → simpan ke database | Diarahkan ke halaman login |
+| `login` | Email, kata sandi | Periksa data → cari pengguna → cocokkan kata sandi → buat sesi → arahkan sesuai peran | Diarahkan ke halaman yang sesuai (pelanggan atau admin) |
+| `logout` | — | Hapus cookie sesi | Diarahkan ke halaman login |
 
-### 3.4 `actions/reservation.ts` — Server Actions Reservasi
+### 3.4 `actions/reservation.ts` — Proses Reservasi
 
-| Action | Input | Proses | Output |
+| Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
-| `getAvailableSlots` | dateStr | Ambil semua court + reservasi CONFIRMED di tanggal itu → map ke slot array | Array court dengan slot kosong/terisi |
-| `createReservation` | FormData | Validasi → **Transaction Serializable** (cek bentrok → hitung harga → insert) → retry P2034 | `{success}` atau `{error}` |
-| `updateReservation` | reservationId, FormData | Cek ownership → Validasi → **Transaction Serializable** (cek bentrok exclude self → update) | `{success}` atau `{error}` |
-| `cancelReservation` | reservationId | Cek ownership → update status ke CANCELLED | `{success}` atau `{error}` |
-| `searchReservations` | filters | Customer: filter miliknya; Admin: filter semua | Array reservasi |
+| `getAvailableSlots` | Tanggal | Ambil semua lapangan + cek reservasi yang sudah terkonfirmasi di tanggal itu → tampilkan slot kosong dan terisi | Daftar lapangan beserta keterangan slot per jam |
+| `createReservation` | Data formulir | Periksa data → jalankan proses terkunci di database (cek bentrok → hitung harga → simpan) | `{berhasil}` atau `{pesan error}` |
+| `updateReservation` | ID reservasi, data formulir | Cek kepemilikan → Periksa data → jalankan proses terkunci (cek bentrok kecuali reservasi sendiri → perbarui data) | `{berhasil}` atau `{pesan error}` |
+| `cancelReservation` | ID reservasi | Cek kepemilikan → ubah status menjadi CANCELLED | `{berhasil}` atau `{pesan error}` |
+| `searchReservations` | Filter (lapangan, tanggal, status, kata kunci) | Pelanggan: hanya menampilkan miliknya; Admin: menampilkan semua | Daftar reservasi yang sesuai filter |
 
-**Fungsi internal:**
+**Fungsi pendukung internal:**
 
-| Fungsi | Deskripsi |
+| Nama Fungsi | Penjelasan |
 |---|---|
-| `checkConflict(tx, courtId, date, startHour, endHour, excludeId?)` | Cek apakah ada reservasi CONFIRMED yang overlap dengan slot yang diminta |
-| `withSerializableRetry(fn, maxRetries)` | Wrapper retry untuk menangani error P2034 (serialization failure) |
+| `checkConflict(...)` | Memeriksa apakah ada reservasi lain yang sudah terkonfirmasi dan waktunya bertabrakan dengan slot yang diminta |
+| `withSerializableRetry(fn, maxRetries)` | Menjalankan ulang proses otomatis jika database menolak karena ada dua permintaan yang bertabrakan di waktu bersamaan |
 
-### 3.5 `actions/laporan.ts` — Server Action Laporan
+### 3.5 `actions/laporan.ts` — Proses Laporan
 
-| Action | Input | Proses | Output |
+| Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
-| `getLaporanPenggunaan` | startDate, endDate, courtId? | Cek admin → validasi → query CONFIRMED saja → agregasi per court | `{totalJam, totalPendapatan, perLapangan[]}` |
+| `getLaporanPenggunaan` | Tanggal mulai, tanggal selesai, lapangan (opsional) | Cek hak akses admin → periksa data → ambil data reservasi terkonfirmasi → hitung total | `{totalJam, totalPendapatan, rincianPerLapangan[]}` |
 
-### 3.6 `middleware.ts` — Route Protection
+### 3.6 `middleware.ts` — Pengaman Halaman
 
-| Kondisi | Aksi |
+| Kondisi | Tindakan Sistem |
 |---|---|
-| Belum login + bukan halaman publik | Redirect ke /login |
-| Sudah login + halaman login/register | Redirect ke halaman sesuai role |
-| Customer akses /admin/* | Redirect ke /reservations |
-| Admin akses /reservations | Redirect ke /admin/reservations |
+| Belum login dan mencoba akses halaman yang memerlukan login | Diarahkan ke halaman login |
+| Sudah login tapi membuka halaman login atau daftar | Diarahkan ke halaman utama sesuai peran |
+| Pelanggan mencoba akses halaman admin | Diarahkan ke halaman reservasi pelanggan |
+| Admin membuka halaman reservasi pelanggan | Diarahkan ke halaman reservasi admin |
 
-## 4. Algoritma Utama: Validasi Bentrok
+---
+
+## 4. Algoritma Utama: Pengecekan Jadwal Bentrok
+
+Berikut adalah logika pengecekan yang digunakan untuk mencegah double booking:
 
 ```
-FUNCTION checkConflict(courtId, date, startHour, endHour, excludeId):
-  existing = SELECT FROM Reservation
-             WHERE courtId = courtId
-               AND date = date
-               AND status = 'CONFIRMED'
-               AND startHour < endHour    // reservasi lain mulai sebelum slot baru selesai
-               AND endHour > startHour    // reservasi lain selesai setelah slot baru mulai
-               AND id != excludeId        // kecualikan diri sendiri saat edit
-  RETURN existing.count > 0
+FUNGSI cekBentrok(lapangan, tanggal, jamMulai, jamSelesai, kecualikanId):
+  data = AMBIL DARI Reservation
+         WHERE lapangan = lapangan
+           AND tanggal = tanggal
+           AND status = 'CONFIRMED'
+           AND jamMulai reservasi lain < jamSelesai yang diminta
+           AND jamSelesai reservasi lain > jamMulai yang diminta
+           AND id != kecualikanId   (diabaikan saat sedang mengedit reservasi sendiri)
+  KEMBALIKAN data.jumlah > 0
 ```
 
-Dijalankan di dalam transaction dengan isolation level **Serializable** untuk mencegah race condition.
+**Penjelasan logika pengecekan overlap jam:**
+Dua rentang waktu dianggap bertabrakan apabila: rentang pertama dimulai sebelum rentang kedua selesai, **dan** rentang pertama selesai setelah rentang kedua dimulai.
+
+Contoh: slot 08:00–10:00 yang sudah ada akan bertabrakan dengan permintaan 09:00–11:00, karena 09:00 < 10:00 dan 11:00 > 08:00.
+
+Fungsi ini dijalankan di dalam proses database yang terkunci (*Serializable transaction*) untuk memastikan tidak ada dua permintaan yang bisa lolos secara bersamaan.

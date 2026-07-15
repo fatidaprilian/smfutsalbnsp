@@ -7,83 +7,103 @@
 
 | Aktor | Deskripsi | Hak Akses |
 |---|---|---|
-| **Admin** | Pengelola SM Sport Center | Login, lihat semua reservasi, filter/cari, batalkan reservasi, lihat laporan |
-| **Customer** | Pelanggan yang ingin menyewa lapangan | Register, login, lihat ketersediaan, buat/edit/batalkan reservasi milik sendiri |
+| **Admin** | Pengelola SM Sport Center | Login, lihat semua reservasi, cari dan filter reservasi, batalkan reservasi, lihat laporan |
+| **Customer** | Pelanggan yang ingin menyewa lapangan | Daftar akun, login, lihat ketersediaan lapangan, buat/ubah/batalkan reservasi milik sendiri |
+
+---
 
 ## 2. Kebutuhan Fungsional
 
-| No | Kebutuhan | Solusi Problem |
+Berikut adalah fitur-fitur yang harus ada dalam sistem, beserta kaitan langsung dengan permasalahan yang ingin diselesaikan:
+
+| No | Kebutuhan | Menyelesaikan Masalah |
 |---|---|---|
-| 1 | Register (customer mendaftar akun: nama, email, password) | Problem (b)(d) |
-| 2 | Login (form tunggal untuk admin & customer, redirect berdasarkan role) | — |
-| 3 | Logout | — |
-| 4 | Lihat ketersediaan lapangan per tanggal (slot jam kosong vs terisi) | Problem (d) |
-| 5 | Reservasi: tambah, lihat, edit, hapus, pencarian, validasi jadwal bentrok | Problem (a)(b) |
-| 6 | Tampilan daftar reservasi (customer: miliknya; admin: semua) | Problem (b) |
-| 7 | Laporan penggunaan lapangan (admin): filter periode + lapangan, total jam, total pendapatan | Problem (c) |
+| 1 | Daftar akun (customer mengisi nama, email, dan password) | Masalah (b)(d) |
+| 2 | Login (satu halaman untuk admin dan customer, diarahkan ke halaman sesuai peran masing-masing) | — |
+| 3 | Keluar (logout) | — |
+| 4 | Lihat ketersediaan lapangan berdasarkan tanggal (tampilan jam kosong dan yang sudah terisi) | Masalah (d) |
+| 5 | Reservasi: tambah, lihat, ubah, hapus, cari, dan cegah jadwal yang bentrok | Masalah (a)(b) |
+| 6 | Daftar reservasi (customer hanya lihat miliknya; admin lihat semua) | Masalah (b) |
+| 7 | Laporan penggunaan lapangan (khusus admin): filter berdasarkan periode dan lapangan, total jam, total pendapatan | Masalah (c) |
+
+---
 
 ## 3. Kebutuhan Non-Fungsional
 
-| No | Kebutuhan | Metrik |
+Kebutuhan yang berkaitan dengan kualitas sistem, bukan fitur:
+
+| No | Kebutuhan | Ukuran |
 |---|---|---|
-| 1 | Waktu respons | Operasi CRUD < 2 detik |
-| 2 | Keamanan password | Hash bcrypt, tidak ada plaintext |
-| 3 | Otorisasi | Customer tidak bisa akses reservasi orang lain (dicek di server) |
-| 4 | Responsivitas | Layout responsif (laptop + tablet) |
+| 1 | Kecepatan respons | Setiap operasi selesai dalam waktu kurang dari 2 detik |
+| 2 | Keamanan kata sandi | Kata sandi tidak disimpan langsung — diubah terlebih dahulu menggunakan metode hash (bcrypt) sebelum tersimpan di database |
+| 3 | Pembatasan akses | Customer tidak bisa melihat atau mengubah reservasi orang lain — pengecekan dilakukan di sisi server |
+| 4 | Tampilan yang menyesuaikan layar | Tampilan nyaman digunakan di laptop maupun tablet |
+
+---
 
 ## 4. Estimasi Pertumbuhan Data
 
-### Asumsi
+### Asumsi Dasar
 - 5 lapangan (2 futsal + 3 badminton)
-- Jam operasional: 08:00–22:00 (14 slot per lapangan)
-- Rata-rata occupancy: 50% di hari biasa, 80% di akhir pekan
-- 1 reservasi = 1–3 jam rata-rata
+- Jam operasional: 08:00–22:00 (14 slot per lapangan per hari)
+- Rata-rata tingkat pemakaian: 50% di hari biasa, 80% di akhir pekan
+- Setiap reservasi rata-rata berdurasi 1–3 jam
 
-### Kalkulasi
+### Perkiraan Data
 
-| Periode | Estimasi Reservasi | Volume Data |
+| Periode | Perkiraan Jumlah Reservasi | Ukuran Data |
 |---|---|---|
-| Per hari (weekday) | ~20 reservasi | ~2 KB |
-| Per hari (weekend) | ~30 reservasi | ~3 KB |
+| Per hari (hari biasa) | ~20 reservasi | ~2 KB |
+| Per hari (akhir pekan) | ~30 reservasi | ~3 KB |
 | Per bulan | ~650 reservasi | ~65 KB |
 | Per tahun | ~7.800 reservasi | ~780 KB |
-| 3 tahun | ~23.400 reservasi | ~2.3 MB |
-| 5 tahun | ~39.000 reservasi | ~3.9 MB |
+| 3 tahun | ~23.400 reservasi | ~2,3 MB |
+| 5 tahun | ~39.000 reservasi | ~3,9 MB |
 
-### Pertumbuhan User
-- Estimasi 50 user baru/bulan → 600/tahun → 3.000 dalam 5 tahun
-- Data user minimal (nama, email, hash) → ~500 KB dalam 5 tahun
+### Perkiraan Pertumbuhan Pengguna
+- Perkiraan 50 pelanggan baru per bulan → 600 per tahun → 3.000 dalam 5 tahun
+- Data setiap pelanggan (nama, email, kata sandi terenkripsi) sangat ringkas → ~500 KB dalam 5 tahun
 
-**Total estimasi 5 tahun: < 5 MB data aktif** — sangat kecil untuk PostgreSQL.
+**Total perkiraan data dalam 5 tahun: kurang dari 5 MB** — jumlah yang sangat kecil untuk sebuah database PostgreSQL.
 
-## 5. Identifikasi Potensi Bottleneck
+---
 
-| No | Bottleneck | Dampak | Probabilitas |
+## 5. Identifikasi Potensi Kemacetan (Bottleneck)
+
+Bagian berikut menjelaskan titik-titik dalam sistem yang berpotensi mengalami masalah performa di kemudian hari:
+
+| No | Potensi Masalah | Dampak | Kemungkinan Terjadi |
 |---|---|---|---|
-| 1 | **Concurrent booking** — dua user memesan slot yang sama bersamaan | Double booking (problem a) | Tinggi |
-| 2 | **Query laporan tanpa index** — aggregasi seluruh tabel reservasi | Waktu respons > 2 detik saat data besar | Sedang |
-| 3 | **Connection pool exhaustion** — terlalu banyak koneksi database saat traffic tinggi | Request timeout | Rendah (skala saat ini) |
-| 4 | **Session storage** — JWT di cookie tidak bisa di-revoke server-side | Logout di satu device tidak logout di device lain | Rendah |
+| 1 | **Dua pelanggan memesan slot yang sama di waktu bersamaan** — sistem bisa menyimpan keduanya jika tidak ditangani | Terjadi double booking (Masalah a) | Tinggi |
+| 2 | **Laporan tanpa indeks database** — pengambilan data laporan dari seluruh tabel reservasi tanpa bantuan indeks | Waktu respons bisa melebihi 2 detik saat data sudah besar | Sedang |
+| 3 | **Jumlah koneksi database yang terlalu banyak** — jika banyak pengguna mengakses sistem secara bersamaan | Permintaan bisa gagal atau menunggu terlalu lama | Rendah (untuk skala saat ini) |
+| 4 | **Sesi login berbasis token** — token yang tersimpan di browser tidak bisa dibatalkan dari sisi server | Logout di satu perangkat tidak otomatis menutup sesi di perangkat lain | Rendah |
 
-## 6. Solusi yang Diimplementasikan
+---
 
-| Bottleneck | Solusi |
+## 6. Solusi yang Sudah Diterapkan
+
+| Potensi Masalah | Solusi yang Diterapkan |
 |---|---|
-| Concurrent booking | Transaction dengan isolation level **Serializable** + retry logic (error P2034) |
-| Query laporan lambat | Composite index `(courtId, date, status)` pada tabel Reservation |
-| Connection pool | Singleton PrismaClient + pg Pool (reuse koneksi) |
+| Dua orang memesan slot bersamaan | Proses penyimpanan reservasi dilakukan dalam satu blok transaksi database yang terkunci (*Serializable*), sehingga hanya satu yang bisa berhasil. Jika terjadi tabrakan, sistem mencoba ulang otomatis hingga 3 kali |
+| Laporan lambat | Tabel reservasi diberi indeks gabungan pada kolom `(courtId, date, status)` sehingga pencarian data laporan jauh lebih cepat |
+| Banyak koneksi database | Koneksi ke database dibuat satu kali dan digunakan bersama (*singleton pattern*), sehingga tidak terjadi pembuatan koneksi baru yang berlebihan |
 
-## 7. Rekomendasi Peningkatan Performa (Pengembangan Lanjutan)
+---
 
-| No | Rekomendasi | Justifikasi |
+## 7. Rekomendasi Peningkatan (Untuk Pengembangan Selanjutnya)
+
+| No | Rekomendasi | Alasan |
 |---|---|---|
-| 1 | **Connection pooling via PgBouncer/Neon pooler** | Menangani lonjakan koneksi saat traffic tinggi |
-| 2 | **Caching ketersediaan dengan Redis** | Mengurangi query database untuk halaman ketersediaan yang sering diakses |
-| 3 | **Pagination pada daftar reservasi** | Mencegah query unbounded saat data > 10.000 record |
-| 4 | **Payment gateway (Midtrans/Xendit)** | Mengurangi risiko no-show dengan sistem DP/pembayaran saat booking |
-| 5 | **Rate limiting** | Mencegah abuse pada endpoint register dan login |
-| 6 | **Monitoring & alerting** | Deteksi dini permasalahan performa di production |
+| 1 | Gunakan pengelola koneksi seperti PgBouncer atau Neon Pooler | Untuk menangani lonjakan pengguna secara bersamaan di masa depan |
+| 2 | Tambahkan sistem cache (misalnya Redis) untuk halaman ketersediaan lapangan | Mengurangi beban query ke database untuk halaman yang sering dikunjungi |
+| 3 | Tambahkan pembagian halaman (pagination) pada daftar reservasi | Mencegah sistem memuat terlalu banyak data sekaligus saat jumlah reservasi sudah sangat besar |
+| 4 | Integrasikan sistem pembayaran (misalnya Midtrans atau Xendit) | Mengurangi risiko pelanggan memesan tapi tidak datang |
+| 5 | Tambahkan pembatasan jumlah permintaan (rate limiting) | Mencegah penyalahgunaan pada halaman daftar akun dan login |
+| 6 | Tambahkan sistem pemantauan dan peringatan otomatis | Mendeteksi masalah performa lebih awal sebelum berdampak ke pengguna |
+
+---
 
 ## 8. Kesimpulan
 
-Dengan volume data < 5 MB dalam 5 tahun dan < 50 concurrent users, sistem ini **tidak memerlukan arsitektur microservice atau distributed system**. Modular monolith dengan PostgreSQL dan index yang tepat sudah mencukupi. Bottleneck utama (concurrent booking) sudah diatasi dengan Serializable transaction. Rekomendasi pengembangan difokuskan untuk skenario pertumbuhan di luar proyeksi awal.
+Dengan total data yang diperkirakan tidak melebihi 5 MB dalam 5 tahun dan jumlah pengguna yang relatif kecil (di bawah 50 pengguna aktif bersamaan), sistem ini **tidak memerlukan arsitektur yang rumit**. Sebuah aplikasi terpadu dengan database PostgreSQL dan indeks yang tepat sudah cukup memadai. Masalah utama yang paling berisiko — yaitu dua orang memesan slot yang sama secara bersamaan — telah diselesaikan dengan mekanisme transaksi terkunci. Rekomendasi pengembangan disusun untuk mengantisipasi pertumbuhan di luar perkiraan awal.

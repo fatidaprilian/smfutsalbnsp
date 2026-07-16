@@ -76,6 +76,17 @@ Login → Lihat Ketersediaan → Buat Reservasi → Lihat Daftar → Ubah Reserv
 | 2 | Pengguna yang belum login mencoba buka /reservations | Diarahkan ke /login | Ditolak, dialihkan ke login | LULUS |
 | 3 | Admin mencoba buka /reservations | Diarahkan ke /admin/reservations | Dialihkan ke dasbor admin | LULUS |
 
+### Skenario 7: Uji Kebijakan Pembatalan dan Ketersediaan Slot
+
+| Langkah | Tindakan | Hasil yang Diharapkan | Hasil Aktual | Status |
+|---|---|---|---|---|
+| 1 | Pelanggan pesan jam 08:00–10:00 dengan DP 50%, bayar QRIS | Status menjadi CONFIRMED | CONFIRMED | LULUS |
+| 2 | Pelanggan membatalkan reservasi DP tersebut | Status berubah menjadi CANCELLED, slot 08:00–10:00 kembali tersedia | Slot kembali available, DP hangus | LULUS |
+| 3 | Pelanggan lain memesan slot yang sama (08:00–10:00) | Reservasi berhasil dibuat (slot sudah dibuka) | Berhasil | LULUS |
+| 4 | Buka laporan admin → cek pendapatan | DP hangus (50% dari total harga) tetap tercatat sebagai pendapatan | Muncul di laporan | LULUS |
+| 5 | Pelanggan pesan jam 14:00–16:00 dengan Lunas 100%, bayar QRIS | Status menjadi CONFIRMED | CONFIRMED | LULUS |
+| 6 | Pelanggan membatalkan reservasi FULL tersebut | Status CANCELLED, namun slot 14:00–16:00 tetap terkunci | Slot tetap tidak bisa dipesan orang lain | LULUS |
+
 ---
 
 ## 3. Catatan Pengujian
@@ -88,7 +99,7 @@ Login → Lihat Ketersediaan → Buat Reservasi → Lihat Daftar → Ubah Reserv
 ## 4. Evaluasi dan Perbaikan
 
 **Evaluasi:** 
-Berdasarkan hasil pengujian pada 5 skenario utama di atas, seluruh alur sistem (*End-to-End*) dari mulai registrasi hingga pembuatan laporan oleh admin telah **berjalan 100% sesuai dengan spesifikasi kebutuhan perangkat lunak**. Sistem berhasil menangani jalur normal (*happy path*) maupun menolak jalur kesalahan (*error path*) dengan menampilkan pesan yang tepat sasaran.
+Berdasarkan hasil pengujian pada 7 skenario utama di atas, seluruh alur sistem (*End-to-End*) dari mulai registrasi hingga pembuatan laporan oleh admin telah **berjalan 100% sesuai dengan spesifikasi kebutuhan perangkat lunak**. Sistem berhasil menangani jalur normal (*happy path*) maupun menolak jalur kesalahan (*error path*) dengan menampilkan pesan yang tepat sasaran.
 
 **Tindakan Perbaikan:**
 Mengingat tingkat kelulusan skenario mencapai 100% pada tahap ini, **tidak ada tindakan perbaikan (bug fixing) lanjutan yang diperlukan** dalam rilis ini. Sistem sudah stabil dan siap digunakan di SM Sport Center. (Catatan: perbaikan *double booking* sebelumnya telah diselesaikan pada fase *Unit Testing* dan *Debugging* awal, sehingga tahap *Integration Testing* ini sudah bersih dari masalah tersebut).

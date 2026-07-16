@@ -39,12 +39,17 @@ export async function getLaporanPenggunaan(params: {
   const end = new Date(endDate);
   end.setHours(0, 0, 0, 0);
 
+  const dateFilter = {
+    gte: start,
+    lte: end,
+  };
+
   const where: Prisma.ReservationWhereInput = {
-    status: "CONFIRMED",
-    date: {
-      gte: start,
-      lte: end,
-    },
+    date: dateFilter,
+    OR: [
+      { status: { in: ["CONFIRMED", "COMPLETED"] } },
+      { status: "CANCELLED", paymentType: "DP" },
+    ],
   };
 
   if (courtId) {
@@ -80,9 +85,13 @@ export async function getLaporanPenggunaan(params: {
       jumlahReservasi: 0,
     };
 
-    existing.totalJam += r.endHour - r.startHour;
-    existing.totalPendapatan += r.totalPrice;
-    existing.jumlahReservasi += 1;
+    if (r.status === "CANCELLED") {
+      existing.totalPendapatan += Math.floor(r.totalPrice / 2);
+    } else {
+      existing.totalJam += r.endHour - r.startHour;
+      existing.totalPendapatan += r.totalPrice;
+      existing.jumlahReservasi += 1;
+    }
 
     courtMap.set(key, existing);
   }

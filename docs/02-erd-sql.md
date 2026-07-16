@@ -49,7 +49,7 @@ erDiagram
 | `totalPrice` disimpan sebagai snapshot | Harga per jam (`pricePerHour`) bisa berubah di kemudian hari, laporan historis harus tetap akurat |
 | `paymentType` | Meyimpan preferensi pembayaran pelanggan: "DP" (50%) atau "FULL" (100%). |
 | Index `(courtId, date, status)` | Query ketersediaan selalu filter tiga kolom ini — index komposit mempercepat query utama |
-| `status` enum | `PENDING` (Tunggu bayar QRIS), `CONFIRMED` (Sudah bayar/DP), `COMPLETED` (Sudah lunas & selesai), `CANCELLED` (Batal). Soft delete. |
+| `status` enum | `PENDING` (Tunggu bayar QRIS), `CONFIRMED` (Sudah bayar/DP), `COMPLETED` (Sudah lunas & selesai), `CANCELLED` (Batal — DP hangus, slot dibuka; FULL tetap mengunci slot). Soft delete. |
 
 ## 3. SQL Script (Migration)
 

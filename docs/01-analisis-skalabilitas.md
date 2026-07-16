@@ -21,10 +21,11 @@ Berikut adalah fitur-fitur yang harus ada dalam sistem, beserta kaitan langsung 
 | 1 | Daftar akun (customer mengisi nama, email, dan password) | Masalah (b)(d) |
 | 2 | Login (satu halaman untuk admin dan customer, diarahkan ke halaman sesuai peran masing-masing) | — |
 | 3 | Keluar (logout) | — |
-| 4 | Lihat ketersediaan lapangan berdasarkan tanggal (tampilan jam kosong dan yang sudah terisi) | Masalah (d) |
+| 4 | Lihat ketersediaan lapangan berdasarkan tanggal (tampilan jam kosong dan yang sudah terisi). Slot reservasi FULL yang dibatalkan tetap terkunci. | Masalah (d) |
 | 5 | Reservasi: tambah, lihat, ubah, hapus, cari, dan cegah jadwal yang bentrok | Masalah (a)(b) |
 | 6 | Daftar reservasi (customer hanya lihat miliknya; admin lihat semua) | Masalah (b) |
-| 7 | Laporan penggunaan lapangan (khusus admin): filter berdasarkan periode dan lapangan, total jam, total pendapatan | Masalah (c) |
+| 7 | Pembayaran DP (50%) atau Lunas (100%) via simulasi QRIS. DP bersifat non-refundable (hangus jika dibatalkan). | Masalah (b) |
+| 8 | Laporan penggunaan lapangan (khusus admin): filter berdasarkan periode dan lapangan, total jam, total pendapatan (termasuk DP hangus) | Masalah (c) |
 
 ---
 

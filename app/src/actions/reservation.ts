@@ -25,7 +25,10 @@ async function checkConflict(
     where: {
       courtId,
       date,
-      status: { in: ["CONFIRMED", "PENDING"] },
+      OR: [
+        { status: { in: ["CONFIRMED", "PENDING", "COMPLETED"] } },
+        { status: "CANCELLED", paymentType: "FULL" },
+      ],
       startHour: { lt: endHour },
       endHour: { gt: startHour },
       ...(excludeId ? { id: { not: excludeId } } : {}),
@@ -67,7 +70,10 @@ export async function getAvailableSlots(dateStr: string) {
   const reservations = await prisma.reservation.findMany({
     where: {
       date,
-      status: { in: ["CONFIRMED", "PENDING"] },
+      OR: [
+        { status: { in: ["CONFIRMED", "PENDING", "COMPLETED"] } },
+        { status: "CANCELLED", paymentType: "FULL" },
+      ],
     },
     select: {
       courtId: true,

@@ -104,10 +104,10 @@ app/
 
 | Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
-| `getAvailableSlots` | Tanggal | Ambil lapangan + cek reservasi terkonfirmasi & pending → tampilkan slot kosong/terisi | Daftar lapangan beserta keterangan slot per jam |
+| `getAvailableSlots` | Tanggal | Ambil lapangan + cek reservasi aktif (CONFIRMED/PENDING/COMPLETED) dan reservasi FULL yang dibatalkan → tampilkan slot kosong/terisi | Daftar lapangan beserta keterangan slot per jam |
 | `createReservation` | Data formulir | Periksa data → jalankan transaksi terkunci (cek bentrok → hitung harga → simpan sbg PENDING) | `{berhasil}` atau `{pesan error}` |
 | `updateReservation` | ID reservasi, data formulir | Cek kepemilikan → Periksa data → jalankan proses terkunci (cek bentrok kecuali reservasi sendiri → perbarui data) | `{berhasil}` atau `{pesan error}` |
-| `cancelReservation` | ID reservasi | Cek kepemilikan → ubah status menjadi CANCELLED | `{berhasil}` atau `{pesan error}` |
+| `cancelReservation` | ID reservasi | Cek kepemilikan → ubah status menjadi CANCELLED. DP hangus (non-refundable), slot dibuka kembali. Reservasi FULL yang dibatalkan tetap mengunci slot. | `{berhasil}` atau `{pesan error}` |
 | `searchReservations` | Filter (lapangan, tanggal, status, kata kunci) | Pelanggan: hanya menampilkan miliknya; Admin: menampilkan semua | Daftar reservasi yang sesuai filter |
 | `processWalletPayment` | ID reservasi | Dicetuskan oleh E-Wallet → ubah status dari PENDING ke CONFIRMED | `{berhasil}` atau `{pesan error}` |
 | `completeReservation` | ID reservasi | Cek hak Admin → ubah status menjadi COMPLETED (Pelunasan) | `{berhasil}` atau `{pesan error}` |
@@ -117,14 +117,14 @@ app/
 
 | Nama Fungsi | Penjelasan |
 |---|---|
-| `checkConflict(...)` | Memeriksa apakah ada reservasi lain yang sudah terkonfirmasi dan waktunya bertabrakan dengan slot yang diminta |
+| `checkConflict(...)` | Memeriksa apakah ada reservasi aktif atau reservasi FULL yang dibatalkan yang waktunya bertabrakan dengan slot yang diminta |
 | `withSerializableRetry(fn, maxRetries)` | Menjalankan ulang proses otomatis jika database menolak karena ada dua permintaan yang bertabrakan di waktu bersamaan |
 
 ### 3.6 `actions/laporan.ts` — Proses Laporan
 
 | Proses | Data Masuk | Langkah-langkah | Hasil |
 |---|---|---|---|
-| `getLaporanPenggunaan` | Tanggal mulai, tanggal selesai, lapangan (opsional) | Cek hak akses admin → periksa data → ambil data reservasi terkonfirmasi → hitung total | `{totalJam, totalPendapatan, rincianPerLapangan[]}` |
+| `getLaporanPenggunaan` | Tanggal mulai, tanggal selesai, lapangan (opsional) | Cek hak akses admin → ambil data reservasi CONFIRMED/COMPLETED + DP hangus dari reservasi CANCELLED → hitung total pendapatan (DP hangus dihitung 50% dari harga penuh) | `{totalJam, totalPendapatan, rincianPerLapangan[]}` |
 | *Cetak PDF Laporan* | Tombol Cetak | Dipicu dari antarmuka pengguna (`window.print()`). Menggunakan *Print Stylesheet* (`@media print`) | Format laporan fisik/PDF tanpa *navbar* dan tombol |
 
 ### 3.7 `middleware.ts` — Pengaman Halaman

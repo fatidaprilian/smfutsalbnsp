@@ -60,7 +60,7 @@ export function NavBar({ role }: { role?: "ADMIN" | "CUSTOMER" }) {
           {role ? (
             <>
               <div className="hidden sm:block text-right">
-                <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">{role}</p>
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{role}</p>
               </div>
               <form action={logout}>
                 <button

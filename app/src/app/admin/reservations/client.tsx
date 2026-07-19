@@ -142,12 +142,12 @@ export function AdminReservationClient({
               <tr key={court.id} className="border-t border-gray-100">
                 <td className="py-2 px-3 font-medium text-gray-800 whitespace-nowrap sticky left-0 bg-white z-10">
                   {court.name}
-                  <span className="block text-xs text-gray-400">{formatPrice(court.pricePerHour)}/jam</span>
+                  <span className="block text-sm text-gray-400">{formatPrice(court.pricePerHour)}/jam</span>
                 </td>
                 {court.slots.map((slot) => (
                   <td key={slot.hour} className="py-2 px-1 text-center">
                     <div
-                      className={`w-8 h-8 rounded mx-auto flex items-center justify-center text-xs font-medium ${
+                      className={`w-10 h-10 rounded mx-auto flex items-center justify-center text-sm font-medium ${
                         slot.available
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
@@ -162,7 +162,7 @@ export function AdminReservationClient({
             ))}
           </tbody>
         </table>
-        <div className="flex gap-4 mt-3 text-xs text-gray-500">
+        <div className="flex gap-4 mt-3 text-sm text-gray-500">
           <span className="flex items-center gap-1"><span className="w-3 h-3 bg-green-100 rounded inline-block"></span> Tersedia</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 bg-red-100 rounded inline-block"></span> Terisi</span>
         </div>
@@ -348,7 +348,7 @@ export function AdminReservationClient({
                   <tr key={r.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4">
                       <div className="font-medium">{r.user.name}</div>
-                      <div className="text-xs text-gray-400">{r.user.email}</div>
+                      <div className="text-sm text-gray-400">{r.user.email}</div>
                     </td>
                     <td className="py-3 px-4">{r.court.name}</td>
                     <td className="py-3 px-4">
@@ -359,13 +359,13 @@ export function AdminReservationClient({
                     </td>
                     <td className="py-3 px-4">
                       {formatPrice(r.totalPrice)}
-                      <span className="block mt-1 text-[10px] uppercase font-bold text-gray-500">
+                      <span className="block mt-1 text-xs uppercase font-bold text-gray-500">
                         {r.paymentType === "DP" ? "DP 50%" : "LUNAS"}
                       </span>
                     </td>
                     <td className="py-3 px-4">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
                           r.status === "CONFIRMED"
                             ? "bg-green-100 text-green-700"
                             : r.status === "PENDING"
@@ -388,22 +388,22 @@ export function AdminReservationClient({
                                 await completeReservation(r.id);
                               }
                             }}
-                            className="text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-[10px] font-medium transition-colors w-max shadow-sm cursor-pointer"
+                            className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm font-medium transition-colors w-max shadow-sm cursor-pointer"
                           >
                             Pelunasan
                           </button>
                         )}
                         {(r.status === "CONFIRMED" || r.status === "PENDING") && (
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 mt-1">
                             <button
                               onClick={() => setEditingId(editingId === r.id ? null : r.id)}
-                              className="text-blue-600 hover:underline text-xs cursor-pointer text-left w-max"
+                              className="text-blue-600 hover:bg-blue-50 px-2 py-2 rounded text-sm cursor-pointer text-left w-max"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => handleCancel(r.id)}
-                              className="text-red-600 hover:underline text-xs cursor-pointer text-left w-max"
+                              className="text-red-600 hover:bg-red-50 px-2 py-2 rounded text-sm cursor-pointer text-left w-max"
                             >
                               Batalkan
                             </button>
@@ -429,7 +429,7 @@ export function AdminReservationClient({
         )}
 
       </div>
-      <p className="text-xs text-gray-400 mt-2">
+      <p className="text-sm text-gray-400 mt-2">
         Menampilkan {reservations.length} reservasi
       </p>
     </div>
@@ -469,7 +469,7 @@ function EditReservationForm({
       )}
       <form action={formAction} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div>
-          <label htmlFor={`edit-court-${reservationId}`} className="block text-xs font-medium text-gray-600 mb-1">Ganti Lapangan</label>
+          <label htmlFor={`edit-court-${reservationId}`} className="block text-sm font-medium text-gray-600 mb-1">Ganti Lapangan</label>
           <select
             id={`edit-court-${reservationId}`}
             name="courtId"
@@ -482,7 +482,7 @@ function EditReservationForm({
           </select>
         </div>
         <div>
-          <label htmlFor={`edit-date-${reservationId}`} className="block text-xs font-medium text-gray-600 mb-1">Ganti Tanggal</label>
+          <label htmlFor={`edit-date-${reservationId}`} className="block text-sm font-medium text-gray-600 mb-1">Ganti Tanggal</label>
           <input
             id={`edit-date-${reservationId}`}
             name="date"
@@ -492,7 +492,7 @@ function EditReservationForm({
           />
         </div>
         <div>
-          <label htmlFor={`edit-start-${reservationId}`} className="block text-xs font-medium text-gray-600 mb-1">Jam Mulai</label>
+          <label htmlFor={`edit-start-${reservationId}`} className="block text-sm font-medium text-gray-600 mb-1">Jam Mulai</label>
           <select
             id={`edit-start-${reservationId}`}
             name="startHour"
@@ -505,7 +505,7 @@ function EditReservationForm({
           </select>
         </div>
         <div>
-          <label htmlFor={`edit-end-${reservationId}`} className="block text-xs font-medium text-gray-600 mb-1">Jam Selesai</label>
+          <label htmlFor={`edit-end-${reservationId}`} className="block text-sm font-medium text-gray-600 mb-1">Jam Selesai</label>
           <select
             id={`edit-end-${reservationId}`}
             name="endHour"

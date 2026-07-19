@@ -87,7 +87,7 @@ export default async function Home() {
                   <div className="flex justify-between items-start mb-5">
                     <div>
                       <h3 className="font-bold text-xl text-zinc-900 tracking-tight">{court.name}</h3>
-                      <span className="inline-block mt-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold tracking-widest uppercase bg-zinc-100 text-zinc-600">
+                      <span className="inline-block mt-1.5 px-2.5 py-1 rounded-md text-xs font-bold tracking-widest uppercase bg-zinc-100 text-zinc-600">
                         {court.type}
                       </span>
                     </div>
@@ -95,7 +95,7 @@ export default async function Home() {
                       <p className="text-sm font-bold text-zinc-900">
                         Rp {court.pricePerHour.toLocaleString("id-ID")}
                       </p>
-                      <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mt-0.5">/ Jam</p>
+                      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-0.5">/ Jam</p>
                     </div>
                   </div>
                   
@@ -104,7 +104,7 @@ export default async function Home() {
                       {validSlots.map((s, idx) => (
                         <div 
                           key={idx} 
-                          className={`text-center py-2 rounded-lg text-xs font-bold border transition-colors ${
+                          className={`text-center py-2 rounded-lg text-sm font-bold border transition-colors ${
                             s.effectivelyAvailable 
                               ? 'bg-white border-zinc-200 text-zinc-900 hover:border-zinc-900 cursor-default' 
                               : 'bg-zinc-50 border-transparent text-zinc-400 line-through'

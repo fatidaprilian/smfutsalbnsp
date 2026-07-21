@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
+import React, { useActionState, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   createReservation,
@@ -345,88 +345,95 @@ export function AdminReservationClient({
               </thead>
               <tbody>
                 {reservations.map((r) => (
-                  <tr key={r.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4">
-                      <div className="font-medium">{r.user.name}</div>
-                      <div className="text-sm text-gray-400">{r.user.email}</div>
-                    </td>
-                    <td className="py-3 px-4">{r.court.name}</td>
-                    <td className="py-3 px-4">
-                      {new Date(r.date).toLocaleDateString("id-ID")}
-                    </td>
-                    <td className="py-3 px-4">
-                      {String(r.startHour).padStart(2, "0")}:00 – {String(r.endHour).padStart(2, "0")}:00
-                    </td>
-                    <td className="py-3 px-4">
-                      {formatPrice(r.totalPrice)}
-                      <span className="block mt-1 text-xs uppercase font-bold text-gray-500">
-                        {r.paymentType === "DP" ? "DP 50%" : "LUNAS"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                          r.status === "CONFIRMED"
-                            ? "bg-green-100 text-green-700"
-                            : r.status === "PENDING"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : r.status === "COMPLETED"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-100 text-gray-500"
-                        }`}
-                      >
-                        {r.status === "CONFIRMED" ? "Dikonfirmasi" : r.status === "PENDING" ? "Menunggu Bayar" : r.status === "COMPLETED" ? "Selesai" : "Dibatalkan"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex flex-col gap-2">
-                        {r.status === "CONFIRMED" && r.paymentType === "DP" && (
-                          <button
-                            onClick={async () => {
-                              if(confirm("Pelanggan sudah melunasi sisa tagihan di kasir?")) {
-                                const { completeReservation } = await import('@/actions/reservation');
-                                await completeReservation(r.id);
-                              }
-                            }}
-                            className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm font-medium transition-colors w-max shadow-sm cursor-pointer"
-                          >
-                            Pelunasan
-                          </button>
-                        )}
-                        {(r.status === "CONFIRMED" || r.status === "PENDING") && (
-                          <div className="flex gap-2 mt-1">
+                  <React.Fragment key={r.id}>
+                    <tr className={`border-b border-gray-100 hover:bg-gray-50 ${editingId === r.id ? "bg-blue-50/50" : ""}`}>
+                      <td className="py-3 px-4">
+                        <div className="font-medium">{r.user.name}</div>
+                        <div className="text-sm text-gray-400">{r.user.email}</div>
+                      </td>
+                      <td className="py-3 px-4">{r.court.name}</td>
+                      <td className="py-3 px-4">
+                        {new Date(r.date).toLocaleDateString("id-ID")}
+                      </td>
+                      <td className="py-3 px-4">
+                        {String(r.startHour).padStart(2, "0")}:00 – {String(r.endHour).padStart(2, "0")}:00
+                      </td>
+                      <td className="py-3 px-4">
+                        {formatPrice(r.totalPrice)}
+                        <span className="block mt-1 text-xs uppercase font-bold text-gray-500">
+                          {r.paymentType === "DP" ? "DP 50%" : "LUNAS"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                            r.status === "CONFIRMED"
+                              ? "bg-green-100 text-green-700"
+                              : r.status === "PENDING"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : r.status === "COMPLETED"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-gray-100 text-gray-500"
+                          }`}
+                        >
+                          {r.status === "CONFIRMED" ? "Dikonfirmasi" : r.status === "PENDING" ? "Menunggu Bayar" : r.status === "COMPLETED" ? "Selesai" : "Dibatalkan"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex flex-wrap gap-3 items-center">
+                          {r.status === "CONFIRMED" && r.paymentType === "DP" && (
                             <button
-                              onClick={() => setEditingId(editingId === r.id ? null : r.id)}
-                              className="text-blue-600 hover:bg-blue-50 px-2 py-2 rounded text-sm cursor-pointer text-left w-max"
+                              onClick={async () => {
+                                if(confirm("Pelanggan sudah melunasi sisa tagihan di kasir?")) {
+                                  const { completeReservation } = await import('@/actions/reservation');
+                                  await completeReservation(r.id);
+                                }
+                              }}
+                              className="text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm cursor-pointer flex items-center gap-1"
                             >
-                              Edit
+                              <span>✔</span> Tandai Lunas
                             </button>
-                            <button
-                              onClick={() => handleCancel(r.id)}
-                              className="text-red-600 hover:bg-red-50 px-2 py-2 rounded text-sm cursor-pointer text-left w-max"
-                            >
-                              Batalkan
-                            </button>
+                          )}
+                          {(r.status === "CONFIRMED" || r.status === "PENDING") && (
+                            <>
+                              <button
+                                onClick={() => setEditingId(editingId === r.id ? null : r.id)}
+                                className="text-blue-600 hover:text-blue-800 text-sm font-medium cursor-pointer"
+                              >
+                                {editingId === r.id ? "Tutup Edit" : "Edit"}
+                              </button>
+                              <button
+                                onClick={() => handleCancel(r.id)}
+                                className="text-red-600 hover:text-red-800 text-sm font-medium cursor-pointer"
+                              >
+                                Batalkan
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {editingId === r.id && (
+                      <tr>
+                        <td colSpan={7} className="p-0 border-b-2 border-blue-200">
+                          <div className="bg-blue-50/30 px-4 pb-4">
+                            <EditReservationForm
+                              reservationId={editingId}
+                              reservation={reservations.find((res) => res.id === editingId)!}
+                              courts={courts}
+                              onClose={() => setEditingId(null)}
+                            />
                           </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
           </div>
         )}
-        
-        {/* Edit Form (inline) */}
-        {editingId && (
-          <EditReservationForm
-            reservationId={editingId}
-            reservation={reservations.find((r) => r.id === editingId)!}
-            courts={courts}
-            onClose={() => setEditingId(null)}
-          />
-        )}
+
 
       </div>
       <p className="text-sm text-gray-400 mt-2">

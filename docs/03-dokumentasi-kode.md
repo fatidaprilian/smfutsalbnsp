@@ -48,7 +48,9 @@ app/
 │   │   │   │   └── client.tsx     # Antarmuka E-Wallet interaktif
 │   │   │   ├── reservations/
 │   │   │   │   ├── page.tsx       # Ambil data reservasi dari server
-│   │   │   │   └── client.tsx     # Tampilan interaktif untuk pelanggan
+│   │   │   │   ├── client.tsx     # Komponen orchestrator (Tampilan interaktif utama pelanggan)
+│   │   │   │   ├── types.ts       # Definisi tipe (Slot, Court, Reservation)
+│   │   │   │   └── components/    # Sub-komponen UI (Grid, Form, Modal QRIS)
 │   │   │   └── admin/
 │   │   │       ├── reservations/
 │   │   │       │   ├── page.tsx   # Ambil semua data reservasi dari server

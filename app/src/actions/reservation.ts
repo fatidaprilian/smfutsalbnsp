@@ -215,6 +215,9 @@ export async function updateReservation(
   if (session.role === "CUSTOMER" && existing.userId !== session.userId) {
     return { error: "Anda tidak memiliki akses ke reservasi ini" };
   }
+  if (existing.status === "COMPLETED" || existing.status === "CANCELLED") {
+    return { error: "Reservasi yang sudah selesai atau dibatalkan tidak dapat diubah" };
+  }
 
   const raw = {
     courtId: formData.get("courtId") || existing.courtId,
@@ -310,6 +313,9 @@ export async function cancelReservation(
   if (session.role === "CUSTOMER" && existing.userId !== session.userId) {
     return { error: "Anda tidak memiliki akses ke reservasi ini" };
   }
+  if (existing.status === "COMPLETED" || existing.status === "CANCELLED") {
+    return { error: "Reservasi yang sudah selesai atau dibatalkan tidak dapat diubah" };
+  }
 
   await prisma.reservation.update({
     where: { id: reservationId },
@@ -390,7 +396,7 @@ export async function processWalletPayment(reservationId: string): Promise<Reser
 
   await prisma.reservation.update({
     where: { id: reservationId },
-    data: { status: "CONFIRMED" },
+    data: { status: existing.paymentType === "FULL" ? "COMPLETED" : "CONFIRMED" },
   });
 
   revalidatePath("/reservations");

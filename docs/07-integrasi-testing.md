@@ -5,7 +5,7 @@
 
 ## 1. Alur Pengujian Integrasi
 
-Pengujian integrasi bertujuan untuk memastikan semua bagian sistem bekerja dengan baik secara keseluruhan dari sudut pandang pengguna. Alur pengujian yang dilakukan:
+Pengujian integrasi ini saya rancang untuk memastikan semua bagian sistem yang telah dibangun bekerja dengan baik secara keseluruhan dari sudut pandang pengguna. Alur pengujian (*end-to-end*) yang saya lakukan:
 
 ```
 Login → Lihat Ketersediaan → Buat Reservasi → Lihat Daftar → Ubah Reservasi → Batalkan → Lihat Laporan (Admin)
@@ -13,7 +13,7 @@ Login → Lihat Ketersediaan → Buat Reservasi → Lihat Daftar → Ubah Reserv
 
 ---
 
-## 2. Skenario Pengujian
+## 2. Skenario Pengujian yang Saya Lakukan
 
 ### Skenario 1: Alur Pelanggan (Login → Reservasi → Ubah → Batalkan)
 
@@ -91,15 +91,15 @@ Login → Lihat Ketersediaan → Buat Reservasi → Lihat Daftar → Ubah Reserv
 
 ## 3. Catatan Pengujian
 
-- Pengujian integrasi ini dilakukan di lingkungan pengembangan (*development environment*) yang mereplika kondisi server produksi.
-- Seluruh pengujian *Black Box* (berdasarkan antarmuka pengguna) berjalan mulus tanpa hambatan.
+- Pengujian integrasi ini saya lakukan di lingkungan pengembangan (*development environment*) yang mereplika kondisi server produksi.
+- Seluruh pengujian *Black Box* (berdasarkan antarmuka pengguna) yang saya susun berjalan mulus tanpa hambatan.
 
 ---
 
 ## 4. Evaluasi dan Perbaikan
 
 **Evaluasi:** 
-Berdasarkan hasil pengujian pada 7 skenario utama di atas, seluruh alur sistem (*End-to-End*) dari mulai registrasi hingga pembuatan laporan oleh admin telah **berjalan 100% sesuai dengan spesifikasi kebutuhan perangkat lunak**. Sistem berhasil menangani jalur normal (*happy path*) maupun menolak jalur kesalahan (*error path*) dengan menampilkan pesan yang tepat sasaran.
+Berdasarkan hasil pengujian pada 7 skenario utama di atas, seluruh alur sistem (*End-to-End*) dari mulai registrasi hingga pembuatan laporan oleh admin telah **berjalan 100% sesuai dengan spesifikasi kebutuhan perangkat lunak** yang saya tetapkan. Sistem berhasil menangani jalur normal (*happy path*) maupun menolak jalur kesalahan (*error path*) dengan menampilkan pesan yang tepat sasaran.
 
 **Tindakan Perbaikan:**
-Mengingat tingkat kelulusan skenario mencapai 100% pada tahap ini, **tidak ada tindakan perbaikan (bug fixing) lanjutan yang diperlukan** dalam rilis ini. Sistem sudah stabil dan siap digunakan di SM Sport Center. (Catatan: perbaikan *double booking* sebelumnya telah diselesaikan pada fase *Unit Testing* dan *Debugging* awal, sehingga tahap *Integration Testing* ini sudah bersih dari masalah tersebut).
+Mengingat tingkat kelulusan skenario mencapai 100% pada tahap pengujian ini, saya menyimpulkan bahwa **tidak ada tindakan perbaikan (bug fixing) lanjutan yang diperlukan** dalam rilis ini. Sistem sudah stabil dan siap digunakan di SM Sport Center. (Catatan: perbaikan *double booking* sebelumnya telah saya selesaikan pada fase *Unit Testing* dan *Debugging* awal, sehingga tahap *Integration Testing* ini sudah bersih dari masalah tersebut).

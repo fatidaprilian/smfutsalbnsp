@@ -1,16 +1,18 @@
 # Dokumen Unit Testing
 ## Sistem Reservasi Lapangan — SM Sport Center
 
+Dokumen ini saya buat untuk mendokumentasikan hasil pengujian *unit testing* yang telah saya lakukan guna memastikan logika inti aplikasi berjalan dengan benar sebelum masuk ke tahap integrasi.
+
 ---
 
-## 1. Alat dan Cara Menjalankan
+## 1. Alat dan Cara Menjalankan yang Saya Gunakan
 
 - **Alat pengujian:** Vitest 4.x
 - **Cara menjalankan:** ketik `npm test` atau `npx vitest run` di terminal
 
 ---
 
-## 2. Data yang Digunakan untuk Pengujian
+## 2. Data yang Saya Gunakan untuk Pengujian
 
 ### Data untuk Pengujian Login
 
@@ -31,7 +33,7 @@
 
 ---
 
-## 3. Skenario dan Hasil Pengujian
+## 3. Skenario dan Hasil Pengujian yang Saya Lakukan
 
 ### 3.1 Pengujian Login
 
@@ -54,7 +56,7 @@
 
 ---
 
-## 4. Output Hasil Pengujian
+## 4. Output Hasil Pengujian yang Saya Dapatkan
 
 ```
  ✓ src/__tests__/auth.test.ts (2 pengujian) 145ms
@@ -70,7 +72,7 @@
 
 ## 5. Kesimpulan
 
-Seluruh 8 skenario pengujian berhasil (LULUS). Pengujian mencakup:
+Dari pengujian yang telah saya lakukan, seluruh 8 skenario pengujian berhasil (LULUS). Pengujian yang saya susun mencakup:
 - **Alur normal:** Login benar, reservasi di slot kosong
 - **Alur kesalahan:** Login dengan kata sandi salah, reservasi di slot yang sudah terisi
 - **Kasus batas:** Slot yang dibatalkan bisa dipesan kembali; slot yang bersebelahan tidak dianggap bentrok

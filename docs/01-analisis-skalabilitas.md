@@ -1,6 +1,8 @@
 # Dokumen Analisis Skalabilitas Perangkat Lunak
 ## Sistem Reservasi Lapangan — SM Sport Center
 
+Dokumen ini saya susun sebagai analisis komprehensif terhadap kapasitas dan skalabilitas sistem yang telah saya bangun. Melalui dokumen ini, penguji (asesor) dapat melihat proyeksi saya terkait daya tahan aplikasi ini di masa depan.
+
 ---
 
 ## 1. Identifikasi Aktor
@@ -14,7 +16,7 @@
 
 ## 2. Kebutuhan Fungsional
 
-Berikut adalah fitur-fitur yang harus ada dalam sistem, beserta kaitan langsung dengan permasalahan yang ingin diselesaikan:
+Berikut adalah fitur-fitur yang telah saya rancang dan implementasikan dalam sistem, beserta kaitan langsung dengan permasalahan yang ingin diselesaikan:
 
 | No | Kebutuhan | Menyelesaikan Masalah |
 |---|---|---|
@@ -31,7 +33,7 @@ Berikut adalah fitur-fitur yang harus ada dalam sistem, beserta kaitan langsung 
 
 ## 3. Kebutuhan Non-Fungsional
 
-Kebutuhan yang berkaitan dengan kualitas sistem, bukan fitur:
+Berikut adalah spesifikasi non-fungsional yang saya tetapkan berkaitan dengan kualitas sistem, bukan fitur:
 
 | No | Kebutuhan | Ukuran |
 |---|---|---|
@@ -44,7 +46,7 @@ Kebutuhan yang berkaitan dengan kualitas sistem, bukan fitur:
 
 ## 4. Estimasi Pertumbuhan Data
 
-### Asumsi Dasar
+### Asumsi Dasar yang Saya Gunakan
 - 5 lapangan (2 futsal + 3 badminton)
 - Jam operasional: 08:00–22:00 (14 slot per lapangan per hari)
 - Rata-rata tingkat pemakaian: 50% di hari biasa, 80% di akhir pekan
@@ -71,7 +73,7 @@ Kebutuhan yang berkaitan dengan kualitas sistem, bukan fitur:
 
 ## 5. Identifikasi Potensi Kemacetan (Bottleneck)
 
-Bagian berikut menjelaskan titik-titik dalam sistem yang berpotensi mengalami masalah performa di kemudian hari:
+Bagian berikut menjelaskan titik-titik dalam sistem yang saya identifikasi berpotensi mengalami masalah performa di kemudian hari:
 
 | No | Potensi Masalah | Dampak | Kemungkinan Terjadi |
 |---|---|---|---|
@@ -82,7 +84,7 @@ Bagian berikut menjelaskan titik-titik dalam sistem yang berpotensi mengalami ma
 
 ---
 
-## 6. Solusi yang Sudah Diterapkan
+## 6. Solusi yang Telah Saya Terapkan
 
 | Potensi Masalah | Solusi yang Diterapkan |
 |---|---|
@@ -93,6 +95,8 @@ Bagian berikut menjelaskan titik-titik dalam sistem yang berpotensi mengalami ma
 ---
 
 ## 7. Rekomendasi Peningkatan (Untuk Pengembangan Selanjutnya)
+
+Berikut adalah beberapa area yang saya rekomendasikan untuk dikembangkan di masa depan:
 
 | No | Rekomendasi | Alasan |
 |---|---|---|
@@ -107,4 +111,4 @@ Bagian berikut menjelaskan titik-titik dalam sistem yang berpotensi mengalami ma
 
 ## 8. Kesimpulan
 
-Dengan total data yang diperkirakan tidak melebihi 5 MB dalam 5 tahun dan jumlah pengguna yang relatif kecil (di bawah 50 pengguna aktif bersamaan), sistem ini **tidak memerlukan arsitektur yang rumit**. Sebuah aplikasi terpadu dengan database PostgreSQL dan indeks yang tepat sudah cukup memadai. Masalah utama yang paling berisiko — yaitu dua orang memesan slot yang sama secara bersamaan — telah diselesaikan dengan mekanisme transaksi terkunci. Rekomendasi pengembangan disusun untuk mengantisipasi pertumbuhan di luar perkiraan awal.
+Berdasarkan hasil analisis saya, dengan total data yang diperkirakan tidak melebihi 5 MB dalam 5 tahun dan jumlah pengguna yang relatif kecil (di bawah 50 pengguna aktif bersamaan), sistem yang saya rancang ini **tidak memerlukan arsitektur yang rumit**. Sebuah aplikasi terpadu (*monolith*) dengan database PostgreSQL dan indeks yang tepat sudah sangat memadai. Masalah utama yang paling berisiko — yaitu dua orang memesan slot yang sama secara bersamaan — telah saya selesaikan dengan mekanisme transaksi terkunci. Rekomendasi pengembangan juga telah saya susun untuk mengantisipasi pertumbuhan di luar perkiraan awal.

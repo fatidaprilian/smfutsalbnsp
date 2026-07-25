@@ -1,11 +1,13 @@
 # Dokumentasi Kode Program
-## Sistem Reservasi Lapangan — SM Sport Center
+## Panduan Arsitektur & Logika Sistem SM Sport Center
+
+Dokumen ini saya rancang sebagai peta jalan (*roadmap*) bagi para penguji (asesor) atau pengembang lain untuk memahami bagaimana berbagai komponen di dalam aplikasi ini berinteraksi. Daripada Anda harus menebak-nebak ke mana alur datanya berjalan, saya menyusun dokumentasi ini agar mudah dibaca (*skimmable*) dengan mengedepankan **Apa**, **Bagaimana**, dan **Mengapa** di balik setiap struktur kode yang saya buat.
 
 ---
 
 ## 1. Struktur Database
 
-Sistem menggunakan 3 tabel utama di dalam database PostgreSQL:
+Dalam sistem ini, saya menggunakan 3 tabel utama di dalam database PostgreSQL:
 
 | Tabel | Keterangan | Hubungan |
 |---|---|---|
@@ -111,7 +113,7 @@ app/
 | `updateReservation` | ID reservasi, data formulir | Cek kepemilikan → Periksa data → jalankan proses terkunci (cek bentrok kecuali reservasi sendiri → perbarui data) | `{berhasil}` atau `{pesan error}` |
 | `cancelReservation` | ID reservasi | Cek kepemilikan → ubah status menjadi CANCELLED. DP hangus (non-refundable), slot dibuka kembali. Reservasi FULL yang dibatalkan tetap mengunci slot. | `{berhasil}` atau `{pesan error}` |
 | `searchReservations` | Filter (lapangan, tanggal, status, kata kunci) | Pelanggan: hanya menampilkan miliknya; Admin: menampilkan semua | Daftar reservasi yang sesuai filter |
-| `processWalletPayment` | ID reservasi | Dicetuskan oleh E-Wallet → ubah status dari PENDING ke CONFIRMED | `{berhasil}` atau `{pesan error}` |
+| `processWalletPayment` | ID reservasi | Dicetuskan oleh E-Wallet → ubah status ke COMPLETED (jika bayar FULL) atau CONFIRMED (jika DP) | `{berhasil}` atau `{pesan error}` |
 | `completeReservation` | ID reservasi | Cek hak Admin → ubah status menjadi COMPLETED (Pelunasan) | `{berhasil}` atau `{pesan error}` |
 | `checkReservationStatus` | ID reservasi | Dicetuskan oleh antarmuka pengguna (polling 3 detik) | Status terbaru dari reservasi |
 
@@ -142,7 +144,7 @@ app/
 
 ## 4. Hak Akses Istimewa Admin (Offline/Walk-in)
 
-Selain pelanggan, **Admin** juga dilengkapi kewenangan penuh untuk memanipulasi jadwal melalui *dashboard* admin:
+Selain pelanggan, saya juga melengkapi **Admin** dengan kewenangan penuh untuk memanipulasi jadwal melalui *dashboard* admin:
 - **Buat Reservasi (Walk-in)**: Admin dapat memasukkan data penyewaan pelanggan yang datang langsung (tanpa aplikasi). Reservasi ini akan terdata atas nama Admin.
 - **Edit Reservasi**: Admin dapat mengedit detail (tanggal, jam, lapangan) dari reservasi yang sudah ada untuk mengakomodir kesalahan atau perpindahan jadwal pelanggan.
 - **Kisi-Kisi Ketersediaan**: Admin memiliki akses langsung ke ketersediaan lapangan (Tersedia/Terisi) sama seperti pelanggan.
@@ -151,22 +153,23 @@ Selain pelanggan, **Admin** juga dilengkapi kewenangan penuh untuk memanipulasi 
 
 ## 5. Fitur Real-Time (Polling)
 
-Sistem menggunakan teknik *polling* (menarik data secara berkala) untuk menciptakan pengalaman *real-time* tanpa WebSocket (demi menghemat biaya *serverless*):
-1. **Ketersediaan Lapangan & Daftar Reservasi**: Menggunakan `router.refresh()` setiap 10 detik agar tampilan kisi-kisi jam dan tabel admin selalu terbarui jika ada pengguna lain yang mem-booking.
+Saya menggunakan teknik *polling* (menarik data secara berkala) di sistem ini untuk menciptakan pengalaman *real-time* tanpa WebSocket (keputusan desain yang saya ambil demi menghemat biaya *serverless*):
+1. **Ketersediaan Lapangan & Daftar Reservasi**: Saya memanfaatkan `router.refresh()` setiap 10 detik agar tampilan kisi-kisi jam dan tabel admin selalu terbarui jika ada pengguna lain yang mem-booking.
 2. **Pemindai Pembayaran QRIS**: Saat modal QRIS terbuka, sistem akan memanggil `checkReservationStatus` setiap 3 detik. Begitu pengguna berhasil membayar lewat HP (status berubah di DB), modal akan otomatis menutup dan halaman akan di-*refresh*.
 
 ---
 
 ## 5. Algoritma Utama: Pengecekan Jadwal Bentrok
 
-Berikut adalah logika pengecekan yang digunakan untuk mencegah double booking:
+Berikut adalah logika pengecekan yang saya rancang untuk mencegah double booking:
 
 ```
 FUNGSI cekBentrok(lapangan, tanggal, jamMulai, jamSelesai, kecualikanId):
   data = AMBIL DARI Reservation
          WHERE lapangan = lapangan
            AND tanggal = tanggal
-           AND status IN ('CONFIRMED', 'PENDING')
+           AND (status IN ('CONFIRMED', 'PENDING', 'COMPLETED') 
+                OR (status = 'CANCELLED' AND paymentType = 'FULL'))
            AND jamMulai reservasi lain < jamSelesai yang diminta
            AND jamSelesai reservasi lain > jamMulai yang diminta
            AND id != kecualikanId   (diabaikan saat sedang mengedit reservasi sendiri)
@@ -178,4 +181,4 @@ Dua rentang waktu dianggap bertabrakan apabila: rentang pertama dimulai sebelum 
 
 Contoh: slot 08:00–10:00 yang sudah ada akan bertabrakan dengan permintaan 09:00–11:00, karena 09:00 < 10:00 dan 11:00 > 08:00.
 
-Fungsi ini dijalankan di dalam proses database yang terkunci (*Serializable transaction*) untuk memastikan tidak ada dua permintaan yang bisa lolos secara bersamaan.
+Saya memastikan fungsi ini selalu dijalankan di dalam proses database yang terkunci (*Serializable transaction*) agar tidak ada dua permintaan yang bisa lolos secara bersamaan.

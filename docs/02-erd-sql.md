@@ -1,9 +1,12 @@
-# ERD dan SQL Script
-## Sistem Reservasi Lapangan — SM Sport Center
+# ERD dan Skema Database
+## Panduan Struktur Data untuk Sistem Reservasi SM Sport Center
+
+Dokumen ini saya susun bagi penguji (asesor) maupun pengembang lain untuk memahami rancangan *database* yang saya buat untuk sistem SM Sport Center. Di sini, Anda akan melihat tidak hanya *apa* saja tabel yang saya miliki, melainkan juga penjelasan *mengapa* saya memilih desain dan tipe data tersebut.
 
 ---
 
-## 1. Entity Relationship Diagram (ERD)
+## 1. Visualisasi ERD (*Entity Relationship Diagram*)
+Diagram di bawah ini menggambarkan alur relasi antar entitas inti. Pembacaan singkatnya: **Satu User** bisa membuat banyak **Reservation** pada satu **Court** (Lapangan).
 
 ```mermaid
 erDiagram
@@ -40,7 +43,47 @@ erDiagram
     Court ||--o{ Reservation : "dipesan untuk"
 ```
 
-## 2. Keputusan Desain Database
+---
+
+## 2. Kamus Data (Spesifikasi Tabel)
+
+Bagian ini merinci struktur fisik dari masing-masing tabel di dalam database, yang menjadi acuan standar (Kamus Data) bagi pengembang.
+
+### 2.1. Tabel `User`
+Menyimpan data otentikasi dan profil pengguna.
+| Nama Kolom | Tipe Data (PostgreSQL) | Constraint | Keterangan |
+|---|---|---|---|
+| `id` | `TEXT` | `PRIMARY KEY` | Dibuat otomatis menggunakan format CUID. |
+| `name` | `TEXT` | `NOT NULL` | Nama lengkap pengguna. |
+| `email` | `TEXT` | `NOT NULL, UNIQUE` | Alamat email (digunakan untuk login). |
+| `passwordHash`| `TEXT` | `NOT NULL` | Kata sandi yang sudah dienkripsi (Bcrypt). |
+| `role` | `ENUM ('ADMIN', 'CUSTOMER')` | `NOT NULL, DEFAULT 'CUSTOMER'` | Hak akses pengguna. |
+| `createdAt` | `TIMESTAMP(3)` | `NOT NULL, DEFAULT NOW()` | Waktu akun didaftarkan. |
+
+### 2.2. Tabel `Court`
+Menyimpan data master lapangan yang disewakan.
+| Nama Kolom | Tipe Data (PostgreSQL) | Constraint | Keterangan |
+|---|---|---|---|
+| `id` | `TEXT` | `PRIMARY KEY` | Dibuat otomatis menggunakan format CUID. |
+| `name` | `TEXT` | `NOT NULL` | Nama/Nomor lapangan (misal: "Futsal A"). |
+| `type` | `ENUM ('FUTSAL', 'BADMINTON')`| `NOT NULL` | Kategori jenis lapangan. |
+| `pricePerHour`| `INTEGER` | `NOT NULL` | Harga sewa per jam (dalam Rupiah). |
+
+### 2.3. Tabel `Reservation`
+Menyimpan data transaksi pemesanan lapangan.
+| Nama Kolom | Tipe Data (PostgreSQL) | Constraint | Keterangan |
+|---|---|---|---|
+| `id` | `TEXT` | `PRIMARY KEY` | Dibuat otomatis menggunakan format CUID. |
+| `courtId` | `TEXT` | `NOT NULL, FOREIGN KEY` | Merujuk ke `Court.id`. |
+| `userId` | `TEXT` | `NOT NULL, FOREIGN KEY` | Merujuk ke `User.id` (Pemesan). |
+| `date` | `DATE` | `NOT NULL` | Tanggal pemesanan (tanpa zona waktu). |
+| `startHour` | `INTEGER` | `NOT NULL` | Jam mulai (format 24 jam, misal: 14). |
+| `endHour` | `INTEGER` | `NOT NULL` | Jam selesai (format 24 jam, misal: 16). |
+| `totalPrice` | `INTEGER` | `NOT NULL` | Total harga (durasi × harga per jam saat dipesan). |
+| `paymentType` | `TEXT` | `NOT NULL, DEFAULT 'DP'` | Jenis bayar: "DP" (50%) atau "FULL" (100%). |
+| `status` | `ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED')` | `NOT NULL, DEFAULT 'PENDING'` | Status alur reservasi. |
+| `createdAt` | `TIMESTAMP(3)` | `NOT NULL, DEFAULT NOW()` | Waktu pesanan dibuat. |
+## 3. Keputusan Desain Database
 
 | Keputusan | Alasan |
 |---|---|
@@ -51,7 +94,7 @@ erDiagram
 | Index `(courtId, date, status)` | Query ketersediaan selalu filter tiga kolom ini — index komposit mempercepat query utama |
 | `status` enum | `PENDING` (Tunggu bayar QRIS), `CONFIRMED` (Sudah bayar/DP), `COMPLETED` (Sudah lunas & selesai), `CANCELLED` (Batal — DP hangus, slot dibuka; FULL tetap mengunci slot). Soft delete. |
 
-## 3. SQL Script (Migration)
+## 4. SQL Script (Migration)
 
 SQL di bawah dihasilkan dari Prisma schema melalui `npx prisma migrate dev`.
 
@@ -123,7 +166,7 @@ ALTER TABLE "Reservation"
     ON DELETE RESTRICT ON UPDATE CASCADE;
 ```
 
-## 4. Seed Data
+## 5. Seed Data
 
 | Tabel | Data |
 |---|---|

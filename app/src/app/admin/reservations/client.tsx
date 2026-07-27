@@ -9,6 +9,7 @@ import {
   completeReservation,
   type ReservationResult 
 } from "@/actions/reservation";
+import { RESERVATION_STATUS, type ReservationStatusType } from "@/lib/constants";
 
 type Slot = { hour: number; available: boolean };
 type CourtSlots = {
@@ -367,16 +368,10 @@ export function AdminReservationClient({
                       <td className="py-3 px-4">
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                            r.status === "CONFIRMED"
-                              ? "bg-green-100 text-green-700"
-                              : r.status === "PENDING"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : r.status === "COMPLETED"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-gray-100 text-gray-500"
+                            RESERVATION_STATUS[r.status as ReservationStatusType]?.color || "bg-gray-100 text-gray-500"
                           }`}
                         >
-                          {r.status === "CONFIRMED" ? "Dikonfirmasi" : r.status === "PENDING" ? "Menunggu Bayar" : r.status === "COMPLETED" ? "Selesai" : "Dibatalkan"}
+                          {RESERVATION_STATUS[r.status as ReservationStatusType]?.label || r.status}
                         </span>
                       </td>
                       <td className="py-3 px-4">

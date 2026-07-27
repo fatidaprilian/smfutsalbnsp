@@ -40,7 +40,7 @@ export const searchReservationSchema = z.object({
   status: z.enum(["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"]).optional(),
 });
 
-export const laporanSchema = z.object({
+export const reportsSchema = z.object({
   startDate: z.string().refine((val) => !isNaN(new Date(val).getTime()), "Tanggal mulai tidak valid"),
   endDate: z.string().refine((val) => !isNaN(new Date(val).getTime()), "Tanggal selesai tidak valid"),
   courtId: z.string().optional(),

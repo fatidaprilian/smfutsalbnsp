@@ -1,9 +1,9 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { LaporanClient } from "./client";
+import { ReportClient } from "./client";
 
-export default async function LaporanPage() {
+export default async function ReportsPage() {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") redirect("/login");
 
@@ -11,5 +11,5 @@ export default async function LaporanPage() {
     orderBy: [{ type: "asc" }, { name: "asc" }],
   });
 
-  return <LaporanClient courts={courts} />;
+  return <ReportClient courts={courts} />;
 }

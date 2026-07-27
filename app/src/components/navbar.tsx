@@ -11,7 +11,7 @@ export function NavBar({ role }: { role?: "ADMIN" | "CUSTOMER" }) {
   if (role === "ADMIN") {
     links = [
       { href: "/admin/reservations", label: "Kelola Reservasi" },
-      { href: "/admin/laporan", label: "Laporan" },
+      { href: "/admin/reports", label: "Laporan" },
     ];
   } else if (role === "CUSTOMER") {
     links = [{ href: "/reservations", label: "Reservasi Lapangan" }];

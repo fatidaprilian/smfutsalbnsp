@@ -2,10 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { laporanSchema } from "@/lib/validations";
+import { reportsSchema } from "@/lib/validations";
 import { Prisma } from "@/generated/prisma";
 
-export type LaporanResult = {
+export type ReportsResult = {
   totalJam: number;
   totalPendapatan: number;
   perLapangan: {
@@ -17,17 +17,17 @@ export type LaporanResult = {
   }[];
 };
 
-export async function getLaporanPenggunaan(params: {
+export async function getReportsUsage(params: {
   startDate: string;
   endDate: string;
   courtId?: string;
-}): Promise<{ error?: string; data?: LaporanResult }> {
+}): Promise<{ error?: string; data?: ReportsResult }> {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") {
     return { error: "Akses ditolak" };
   }
 
-  const parsed = laporanSchema.safeParse(params);
+  const parsed = reportsSchema.safeParse(params);
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message };
   }

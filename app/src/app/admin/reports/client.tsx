@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { getLaporanPenggunaan, type LaporanResult } from "@/actions/laporan";
+import { getReportsUsage, type ReportsResult } from "@/actions/reports";
 
 type Court = { id: string; name: string; type: string; pricePerHour: number };
 
-export function LaporanClient({ courts }: { courts: Court[] }) {
+export function ReportClient({ courts }: { courts: Court[] }) {
   const today = new Date();
   const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
   const [startDate, setStartDate] = useState(firstOfMonth.toISOString().split("T")[0]);
   const [endDate, setEndDate] = useState(today.toISOString().split("T")[0]);
   const [courtId, setCourtId] = useState("");
-  const [data, setData] = useState<LaporanResult | null>(null);
+  const [data, setData] = useState<ReportsResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +22,7 @@ export function LaporanClient({ courts }: { courts: Court[] }) {
     setError("");
     setData(null);
 
-    const result = await getLaporanPenggunaan({
+    const result = await getReportsUsage({
       startDate,
       endDate,
       courtId: courtId || undefined,

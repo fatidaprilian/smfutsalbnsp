@@ -53,10 +53,18 @@ export function AvailabilityGrid({
               {court.slots.map((slot) => (
                 <td key={slot.hour} className="py-2 px-1 text-center">
                   <div
-                    className={`w-10 h-10 rounded mx-auto flex items-center justify-center text-sm font-medium ${
+                    /* 
+                    // notif klik.
+                    onClick={() => {
+                      if (!slot.available) {
+                        alert(`Maaf, lapangan ${court.name} di jam ${String(slot.hour).padStart(2, "0")}:00 sudah terisi atau tidak tersedia.`);
+                      }
+                    }}
+                    */
+                    className={`w-10 h-10 rounded mx-auto flex items-center justify-center text-sm font-medium transition-colors ${
                       slot.available
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
+                        ? "bg-green-100 text-green-700 hover:bg-green-200"
+                        : "bg-red-100 text-red-700 cursor-not-allowed"
                     }`}
                     title={slot.available ? "Tersedia" : "Terisi"}
                   >

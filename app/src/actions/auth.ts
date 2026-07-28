@@ -12,6 +12,7 @@ import { loginSchema, registerSchema } from "@/lib/validations";
 
 export type AuthResult = {
   error?: string;
+  fieldErrors?: Record<string, string[]>;
 };
 
 export async function registerCustomer(
@@ -26,7 +27,10 @@ export async function registerCustomer(
 
   const parsed = registerSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0].message };
+    return { 
+      error: "Periksa kembali data yang Anda masukkan",
+      fieldErrors: parsed.error.flatten().fieldErrors 
+    };
   }
 
   const { name, email, password } = parsed.data;
@@ -59,7 +63,10 @@ export async function login(
 
   const parsed = loginSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0].message };
+    return { 
+      error: "Periksa kembali data yang Anda masukkan",
+      fieldErrors: parsed.error.flatten().fieldErrors 
+    };
   }
 
   const { email, password } = parsed.data;

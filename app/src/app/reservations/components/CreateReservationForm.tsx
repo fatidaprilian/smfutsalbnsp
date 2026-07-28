@@ -43,6 +43,7 @@ export function CreateReservationForm({
       <form
         action={createAction}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4"
+        noValidate
       >
         <input type="hidden" name="date" value={selectedDate} />
         <div>
@@ -55,8 +56,11 @@ export function CreateReservationForm({
           <select
             id="courtId"
             name="courtId"
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+              createState.fieldErrors?.courtId
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           >
             <option value="">Pilih lapangan</option>
             {courts.map((c) => (
@@ -65,6 +69,11 @@ export function CreateReservationForm({
               </option>
             ))}
           </select>
+          {createState.fieldErrors?.courtId && (
+            <p className="mt-1 text-xs text-red-600 font-medium">
+              {createState.fieldErrors.courtId[0]}
+            </p>
+          )}
         </div>
         <div>
           <label
@@ -76,7 +85,6 @@ export function CreateReservationForm({
           <select
             id="startHour"
             name="startHour"
-            required
             onChange={(e) => {
               const form = e.target.form;
               if (form) {
@@ -98,7 +106,11 @@ export function CreateReservationForm({
                 }
               }
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+              createState.fieldErrors?.startHour
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           >
             <option value="">Pilih Jam</option>
             {Array.from({ length: 14 }, (_, i) => i + 8).map((h) => {
@@ -116,6 +128,11 @@ export function CreateReservationForm({
               );
             })}
           </select>
+          {createState.fieldErrors?.startHour && (
+            <p className="mt-1 text-xs text-red-600 font-medium">
+              {createState.fieldErrors.startHour[0]}
+            </p>
+          )}
         </div>
         <div>
           <label
@@ -127,8 +144,11 @@ export function CreateReservationForm({
           <select
             id="endHour"
             name="endHour"
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+              createState.fieldErrors?.endHour
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           >
             <option value="">Pilih Jam</option>
             {Array.from({ length: 14 }, (_, i) => i + 9).map((h) => {
@@ -146,6 +166,11 @@ export function CreateReservationForm({
               );
             })}
           </select>
+          {createState.fieldErrors?.endHour && (
+            <p className="mt-1 text-xs text-red-600 font-medium">
+              {createState.fieldErrors.endHour[0]}
+            </p>
+          )}
         </div>
         <div>
           <label

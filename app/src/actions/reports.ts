@@ -21,7 +21,7 @@ export async function getReportsUsage(params: {
   startDate: string;
   endDate: string;
   courtId?: string;
-}): Promise<{ error?: string; data?: ReportsResult }> {
+}): Promise<{ error?: string; fieldErrors?: Record<string, string[]>; data?: ReportsResult }> {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") {
     return { error: "Akses ditolak" };
@@ -29,7 +29,10 @@ export async function getReportsUsage(params: {
 
   const parsed = reportsSchema.safeParse(params);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0].message };
+    return { 
+      error: "Periksa kembali input tanggal Anda", 
+      fieldErrors: parsed.error.flatten().fieldErrors 
+    };
   }
 
   const { startDate, endDate, courtId } = parsed.data;

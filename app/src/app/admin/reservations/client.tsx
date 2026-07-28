@@ -185,15 +185,18 @@ export function AdminReservationClient({
           </div>
         )}
 
-        <form action={createAction} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <form action={createAction} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4" noValidate>
           <input type="hidden" name="date" value={selectedDate} />
           <div>
             <label htmlFor="courtId" className="block text-sm font-medium text-gray-700 mb-1">Lapangan</label>
             <select
               id="courtId"
               name="courtId"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                createState.fieldErrors?.courtId
+                  ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
             >
               <option value="">Pilih lapangan</option>
               {courts.map((c) => (
@@ -202,13 +205,15 @@ export function AdminReservationClient({
                 </option>
               ))}
             </select>
+            {createState.fieldErrors?.courtId && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{createState.fieldErrors.courtId[0]}</p>
+            )}
           </div>
           <div>
             <label htmlFor="startHour" className="block text-sm font-medium text-gray-700 mb-1">Jam Mulai</label>
             <select
               id="startHour"
               name="startHour"
-              required
               onChange={(e) => {
                 const form = e.target.form;
                 if (form) {
@@ -225,27 +230,40 @@ export function AdminReservationClient({
                   }
                 }
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                createState.fieldErrors?.startHour
+                  ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
             >
               <option value="">Pilih Jam</option>
               {Array.from({ length: 14 }, (_, i) => i + 8).map((h) => (
                 <option key={h} value={h}>{String(h).padStart(2, "0")}:00</option>
               ))}
             </select>
+            {createState.fieldErrors?.startHour && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{createState.fieldErrors.startHour[0]}</p>
+            )}
           </div>
           <div>
             <label htmlFor="endHour" className="block text-sm font-medium text-gray-700 mb-1">Jam Selesai</label>
             <select
               id="endHour"
               name="endHour"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                createState.fieldErrors?.endHour
+                  ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
             >
               <option value="">Pilih Jam</option>
               {Array.from({ length: 14 }, (_, i) => i + 9).map((h) => (
                 <option key={h} value={h}>{String(h).padStart(2, "0")}:00</option>
               ))}
             </select>
+            {createState.fieldErrors?.endHour && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{createState.fieldErrors.endHour[0]}</p>
+            )}
           </div>
           <div>
             <label htmlFor="paymentType" className="block text-sm font-medium text-gray-700 mb-1">Tipe Bayar</label>
@@ -469,19 +487,26 @@ function EditReservationForm({
           {state.error}
         </div>
       )}
-      <form action={formAction} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+      <form action={formAction} className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-start" noValidate>
         <div>
           <label htmlFor={`edit-court-${reservationId}`} className="block text-sm font-medium text-gray-600 mb-1">Ganti Lapangan</label>
           <select
             id={`edit-court-${reservationId}`}
             name="courtId"
             defaultValue={reservation.courtId}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
+              state.fieldErrors?.courtId
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           >
             {courts.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
+          {state.fieldErrors?.courtId && (
+            <p className="mt-1 text-xs text-red-600 font-medium">{state.fieldErrors.courtId[0]}</p>
+          )}
         </div>
         <div>
           <label htmlFor={`edit-date-${reservationId}`} className="block text-sm font-medium text-gray-600 mb-1">Ganti Tanggal</label>
@@ -490,8 +515,15 @@ function EditReservationForm({
             name="date"
             type="date"
             defaultValue={new Date(reservation.date).toISOString().split("T")[0]}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
+              state.fieldErrors?.date
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           />
+          {state.fieldErrors?.date && (
+            <p className="mt-1 text-xs text-red-600 font-medium">{state.fieldErrors.date[0]}</p>
+          )}
         </div>
         <div>
           <label htmlFor={`edit-start-${reservationId}`} className="block text-sm font-medium text-gray-600 mb-1">Jam Mulai</label>
@@ -499,12 +531,19 @@ function EditReservationForm({
             id={`edit-start-${reservationId}`}
             name="startHour"
             defaultValue={reservation.startHour}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
+              state.fieldErrors?.startHour
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           >
             {Array.from({ length: 14 }, (_, i) => i + 8).map((h) => (
               <option key={h} value={h}>{String(h).padStart(2, "0")}:00</option>
             ))}
           </select>
+          {state.fieldErrors?.startHour && (
+            <p className="mt-1 text-xs text-red-600 font-medium">{state.fieldErrors.startHour[0]}</p>
+          )}
         </div>
         <div>
           <label htmlFor={`edit-end-${reservationId}`} className="block text-sm font-medium text-gray-600 mb-1">Jam Selesai</label>
@@ -512,12 +551,19 @@ function EditReservationForm({
             id={`edit-end-${reservationId}`}
             name="endHour"
             defaultValue={reservation.endHour}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
+              state.fieldErrors?.endHour
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           >
             {Array.from({ length: 14 }, (_, i) => i + 9).map((h) => (
               <option key={h} value={h}>{String(h).padStart(2, "0")}:00</option>
             ))}
           </select>
+          {state.fieldErrors?.endHour && (
+            <p className="mt-1 text-xs text-red-600 font-medium">{state.fieldErrors.endHour[0]}</p>
+          )}
         </div>
         <div className="flex items-end gap-2 sm:col-span-4 justify-end">
           <button

@@ -9,6 +9,7 @@ import { Prisma } from "@/generated/prisma";
 
 export type ReservationResult = {
   error?: string;
+  fieldErrors?: Record<string, string[]>;
   success?: boolean;
 };
 
@@ -129,7 +130,10 @@ export async function createReservation(
 
   const parsed = reservationSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0].message };
+    return { 
+      error: "Periksa kembali data reservasi Anda", 
+      fieldErrors: parsed.error.flatten().fieldErrors 
+    };
   }
 
   const { courtId, date, startHour, endHour, paymentType } = parsed.data;
@@ -228,7 +232,10 @@ export async function updateReservation(
 
   const parsed = reservationSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0].message };
+    return { 
+      error: "Periksa kembali data reservasi Anda", 
+      fieldErrors: parsed.error.flatten().fieldErrors 
+    };
   }
 
   const { courtId, date, startHour, endHour } = parsed.data;

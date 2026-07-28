@@ -26,7 +26,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form action={action} className="space-y-5">
+          <form action={action} className="space-y-5" noValidate>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5" htmlFor="email">
                 Alamat Email
@@ -36,10 +36,18 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className={`w-full px-4 py-3 rounded-xl border bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                  state.fieldErrors?.email
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                }`}
                 placeholder="budi@email.com"
               />
+              {state.fieldErrors?.email && (
+                <p className="mt-1 text-sm text-red-600 font-medium">
+                  {state.fieldErrors.email[0]}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5" htmlFor="password">
@@ -50,10 +58,18 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 autoComplete="current-password"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className={`w-full px-4 py-3 rounded-xl border bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                  state.fieldErrors?.password
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                }`}
                 placeholder="••••••••"
               />
+              {state.fieldErrors?.password && (
+                <p className="mt-1 text-sm text-red-600 font-medium">
+                  {state.fieldErrors.password[0]}
+                </p>
+              )}
             </div>
             <button
               type="submit"

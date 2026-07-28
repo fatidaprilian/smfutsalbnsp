@@ -40,7 +40,8 @@ export function EditReservationForm({
       )}
       <form
         action={formAction}
-        className="grid grid-cols-1 sm:grid-cols-4 gap-3"
+        className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-start"
+        noValidate
       >
         <input type="hidden" name="courtId" value={reservation.courtId} />
         <div>
@@ -58,8 +59,17 @@ export function EditReservationForm({
               new Date(reservation.date).toISOString().split("T")[0]
             }
             min={new Date().toISOString().split("T")[0]}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
+              state.fieldErrors?.date
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           />
+          {state.fieldErrors?.date && (
+            <p className="mt-1 text-xs text-red-600 font-medium">
+              {state.fieldErrors.date[0]}
+            </p>
+          )}
         </div>
         <div>
           <label
@@ -72,7 +82,11 @@ export function EditReservationForm({
             id={`edit-start-${reservationId}`}
             name="startHour"
             defaultValue={reservation.startHour}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
+              state.fieldErrors?.startHour
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           >
             {Array.from({ length: 14 }, (_, i) => i + 8).map((h) => (
               <option key={h} value={h}>
@@ -80,6 +94,11 @@ export function EditReservationForm({
               </option>
             ))}
           </select>
+          {state.fieldErrors?.startHour && (
+            <p className="mt-1 text-xs text-red-600 font-medium">
+              {state.fieldErrors.startHour[0]}
+            </p>
+          )}
         </div>
         <div>
           <label
@@ -92,7 +111,11 @@ export function EditReservationForm({
             id={`edit-end-${reservationId}`}
             name="endHour"
             defaultValue={reservation.endHour}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
+              state.fieldErrors?.endHour
+                ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
           >
             {Array.from({ length: 14 }, (_, i) => i + 9).map((h) => (
               <option key={h} value={h}>
@@ -100,6 +123,11 @@ export function EditReservationForm({
               </option>
             ))}
           </select>
+          {state.fieldErrors?.endHour && (
+            <p className="mt-1 text-xs text-red-600 font-medium">
+              {state.fieldErrors.endHour[0]}
+            </p>
+          )}
         </div>
         <div className="flex items-end gap-2">
           <button

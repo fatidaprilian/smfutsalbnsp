@@ -6,7 +6,6 @@ import { cancelReservation } from "@/actions/reservation";
 import { Court, Reservation } from "../types";
 import { EditReservationForm } from "./EditReservationForm";
 import { RESERVATION_STATUS, type ReservationStatusType } from "@/lib/constants";
-import { UploadReceiptModal } from "./UploadReceiptModal";
 import { BookingTicketModal } from "./BookingTicketModal";
 export function ReservationList({
   reservations,
@@ -24,7 +23,6 @@ export function ReservationList({
   const router = useRouter();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState(searchQuery);
-  const [uploadModalId, setUploadModalId] = useState<string | null>(null);
   const [ticketModalId, setTicketModalId] = useState<string | null>(null);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -127,18 +125,7 @@ export function ReservationList({
                             >
                               Bayar QRIS
                             </button>
-                            <button
-                              onClick={() => setUploadModalId(r.id)}
-                              className="text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm cursor-pointer"
-                            >
-                              Upload Bukti
-                            </button>
                           </>
-                        )}
-                        {r.paymentReceipt && (
-                          <a href={r.paymentReceipt} target="_blank" rel="noreferrer" className="text-xs text-gray-500 hover:text-blue-600 underline">
-                            Lihat Bukti
-                          </a>
                         )}
                         {(r.status === "CONFIRMED" || r.status === "COMPLETED") && (
                           <button
@@ -189,12 +176,6 @@ export function ReservationList({
           </table>
         </div>
       )}
-      
-      <UploadReceiptModal
-        uploadModalId={uploadModalId}
-        reservations={reservations}
-        onClose={() => setUploadModalId(null)}
-      />
       
       <BookingTicketModal
         ticketModalId={ticketModalId}

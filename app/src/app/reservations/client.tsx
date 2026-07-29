@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CourtSlots, Court, Reservation } from "./types";
-import { AvailabilityGrid } from "./components/AvailabilityGrid";
-import { CreateReservationForm } from "./components/CreateReservationForm";
+import { InteractiveBookingGrid } from "./components/InteractiveBookingGrid";
 import { ReservationList } from "./components/ReservationList";
 import { PaymentModal } from "./components/PaymentModal";
 
@@ -64,9 +63,7 @@ export function CustomerReservationClient({
         />
       </div>
 
-      <AvailabilityGrid slots={slots} selectedDate={selectedDate} />
-
-      <CreateReservationForm selectedDate={selectedDate} courts={courts} />
+      <InteractiveBookingGrid slots={slots} selectedDate={selectedDate} />
 
       <ReservationList
         reservations={reservations}

@@ -451,3 +451,51 @@ export async function completeReservation(reservationId: string): Promise<Reserv
   revalidatePath("/admin/reservations");
   return { success: true };
 }
+
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
+
+export async function uploadPaymentReceipt(reservationId: string, formData: FormData): Promise<ReservationResult> {
+  const session = await getSession();
+  if (!session) {
+    return { error: "Anda harus login terlebih dahulu" };
+  }
+
+  const existing = await prisma.reservation.findUnique({
+    where: { id: reservationId },
+  });
+  if (!existing) {
+    return { error: "Reservasi tidak ditemukan" };
+  }
+
+  if (session.role === "CUSTOMER" && existing.userId !== session.userId) {
+    return { error: "Anda tidak memiliki akses ke reservasi ini" };
+  }
+
+  const file = formData.get('receipt') as File;
+  if (!file || !(file instanceof File) || file.size === 0) {
+    return { error: "File bukti pembayaran tidak ditemukan" };
+  }
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    const path = join(process.cwd(), 'public/uploads', filename);
+
+    await writeFile(path, buffer);
+
+    await prisma.reservation.update({
+      where: { id: reservationId },
+      data: { paymentReceipt: `/uploads/${filename}` }
+    });
+
+    revalidatePath("/reservations");
+    revalidatePath("/admin/reservations");
+    return { success: true };
+  } catch (error) {
+    console.error("Upload error:", error);
+    return { error: "Gagal mengunggah bukti pembayaran" };
+  }
+}

@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
 }
 
 model User {
@@ -50,6 +50,7 @@ model Reservation {
   status     ReservationStatus @default(PENDING)
   guestName  String?
   guestPhone String?
+  paymentReceipt String?
   createdAt  DateTime          @default(now())
 
   @@index([courtId, date, status])

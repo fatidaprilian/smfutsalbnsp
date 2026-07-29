@@ -16,6 +16,7 @@ export type Reservation = {
   totalPrice: number;
   status: string;
   paymentType: string;
+  paymentReceipt?: string;
   court: { name: string; type: string };
   createdAt: string;
 };

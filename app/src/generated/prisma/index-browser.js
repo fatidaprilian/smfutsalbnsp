@@ -149,6 +149,7 @@ exports.Prisma.ReservationScalarFieldEnum = {
   status: 'status',
   guestName: 'guestName',
   guestPhone: 'guestPhone',
+  paymentReceipt: 'paymentReceipt',
   createdAt: 'createdAt'
 };
 

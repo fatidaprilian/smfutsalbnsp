@@ -37,20 +37,21 @@ enum CourtType {
 }
 
 model Reservation {
-  id          String            @id @default(cuid())
-  courtId     String
-  court       Court             @relation(fields: [courtId], references: [id])
-  userId      String
-  user        User              @relation(fields: [userId], references: [id])
-  date        DateTime          @db.Date
-  startHour   Int
-  endHour     Int
-  totalPrice  Int
-  paymentType String            @default("DP") // "DP" or "FULL"
-  status      ReservationStatus @default(PENDING)
-  guestName   String?
-  guestPhone  String?
-  createdAt   DateTime          @default(now())
+  id             String            @id @default(cuid())
+  courtId        String
+  court          Court             @relation(fields: [courtId], references: [id])
+  userId         String
+  user           User              @relation(fields: [userId], references: [id])
+  date           DateTime          @db.Date
+  startHour      Int
+  endHour        Int
+  totalPrice     Int
+  paymentType    String            @default("DP") // "DP" or "FULL"
+  status         ReservationStatus @default(PENDING)
+  guestName      String?
+  guestPhone     String?
+  paymentReceipt String?
+  createdAt      DateTime          @default(now())
 
   @@index([courtId, date, status])
 }

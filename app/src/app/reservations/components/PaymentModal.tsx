@@ -20,7 +20,7 @@ export function PaymentModal({
     if (!payModalId) return;
     const interval = setInterval(async () => {
       const status = await checkReservationStatus(payModalId);
-      if (status === "CONFIRMED") {
+      if (status === "CONFIRMED" || status === "COMPLETED") {
         onClose();
         router.refresh();
         alert("Pembayaran Berhasil Dikonfirmasi!");

@@ -12,6 +12,7 @@ model User {
   name         String
   email        String        @unique
   passwordHash String
+  phone        String?
   role         Role          @default(CUSTOMER)
   reservations Reservation[]
   createdAt    DateTime      @default(now())
@@ -47,6 +48,8 @@ model Reservation {
   totalPrice  Int
   paymentType String            @default("DP") // "DP" or "FULL"
   status      ReservationStatus @default(PENDING)
+  guestName   String?
+  guestPhone  String?
   createdAt   DateTime          @default(now())
 
   @@index([courtId, date, status])

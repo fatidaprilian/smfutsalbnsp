@@ -126,6 +126,8 @@ export async function createReservation(
     startHour: formData.get("startHour"),
     endHour: formData.get("endHour"),
     paymentType: formData.get("paymentType") || "DP",
+    guestName: formData.get("guestName") || undefined,
+    guestPhone: formData.get("guestPhone") || undefined,
   };
 
   const parsed = reservationSchema.safeParse(raw);
@@ -136,7 +138,7 @@ export async function createReservation(
     };
   }
 
-  const { courtId, date, startHour, endHour, paymentType } = parsed.data;
+  const { courtId, date, startHour, endHour, paymentType, guestName, guestPhone } = parsed.data;
   const reservationDate = new Date(date);
   reservationDate.setHours(0, 0, 0, 0);
 
@@ -181,6 +183,8 @@ export async function createReservation(
               totalPrice: (endHour - startHour) * court.pricePerHour,
               paymentType,
               status: "PENDING",
+              guestName: session.role === "ADMIN" ? guestName : undefined,
+              guestPhone: session.role === "ADMIN" ? guestPhone : undefined,
             },
           });
         },
@@ -375,6 +379,9 @@ export async function searchReservations(params: {
       { court: { name: { contains: query, mode: "insensitive" } } },
       { user: { name: { contains: query, mode: "insensitive" } } },
       { user: { email: { contains: query, mode: "insensitive" } } },
+      { user: { phone: { contains: query, mode: "insensitive" } } },
+      { guestName: { contains: query, mode: "insensitive" } },
+      { guestPhone: { contains: query, mode: "insensitive" } },
     ];
   }
 

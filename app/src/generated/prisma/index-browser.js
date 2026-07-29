@@ -125,6 +125,7 @@ exports.Prisma.UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   passwordHash: 'passwordHash',
+  phone: 'phone',
   role: 'role',
   createdAt: 'createdAt'
 };
@@ -146,6 +147,8 @@ exports.Prisma.ReservationScalarFieldEnum = {
   totalPrice: 'totalPrice',
   paymentType: 'paymentType',
   status: 'status',
+  guestName: 'guestName',
+  guestPhone: 'guestPhone',
   createdAt: 'createdAt'
 };
 
@@ -157,6 +160,11 @@ exports.Prisma.SortOrder = {
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN',

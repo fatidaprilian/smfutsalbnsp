@@ -72,6 +72,28 @@ export default function RegisterPage() {
               )}
             </div>
             <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5" htmlFor="phone">
+                Nomor Telepon / WA
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                className={`w-full px-4 py-3 rounded-xl border bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                  state.fieldErrors?.phone
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                }`}
+                placeholder="081234567890"
+              />
+              {state.fieldErrors?.phone && (
+                <p className="mt-1 text-sm text-red-600 font-medium">
+                  {state.fieldErrors.phone[0]}
+                </p>
+              )}
+            </div>
+            <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5" htmlFor="password">
                 Password
               </label>

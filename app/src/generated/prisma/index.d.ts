@@ -1167,6 +1167,7 @@ export namespace Prisma {
     name: string | null
     email: string | null
     passwordHash: string | null
+    phone: string | null
     role: $Enums.Role | null
     createdAt: Date | null
   }
@@ -1176,6 +1177,7 @@ export namespace Prisma {
     name: string | null
     email: string | null
     passwordHash: string | null
+    phone: string | null
     role: $Enums.Role | null
     createdAt: Date | null
   }
@@ -1185,6 +1187,7 @@ export namespace Prisma {
     name: number
     email: number
     passwordHash: number
+    phone: number
     role: number
     createdAt: number
     _all: number
@@ -1196,6 +1199,7 @@ export namespace Prisma {
     name?: true
     email?: true
     passwordHash?: true
+    phone?: true
     role?: true
     createdAt?: true
   }
@@ -1205,6 +1209,7 @@ export namespace Prisma {
     name?: true
     email?: true
     passwordHash?: true
+    phone?: true
     role?: true
     createdAt?: true
   }
@@ -1214,6 +1219,7 @@ export namespace Prisma {
     name?: true
     email?: true
     passwordHash?: true
+    phone?: true
     role?: true
     createdAt?: true
     _all?: true
@@ -1296,6 +1302,7 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone: string | null
     role: $Enums.Role
     createdAt: Date
     _count: UserCountAggregateOutputType | null
@@ -1322,6 +1329,7 @@ export namespace Prisma {
     name?: boolean
     email?: boolean
     passwordHash?: boolean
+    phone?: boolean
     role?: boolean
     createdAt?: boolean
     reservations?: boolean | User$reservationsArgs<ExtArgs>
@@ -1333,6 +1341,7 @@ export namespace Prisma {
     name?: boolean
     email?: boolean
     passwordHash?: boolean
+    phone?: boolean
     role?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1342,6 +1351,7 @@ export namespace Prisma {
     name?: boolean
     email?: boolean
     passwordHash?: boolean
+    phone?: boolean
     role?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1351,11 +1361,12 @@ export namespace Prisma {
     name?: boolean
     email?: boolean
     passwordHash?: boolean
+    phone?: boolean
     role?: boolean
     createdAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "role" | "createdAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "phone" | "role" | "createdAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reservations?: boolean | User$reservationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1373,6 +1384,7 @@ export namespace Prisma {
       name: string
       email: string
       passwordHash: string
+      phone: string | null
       role: $Enums.Role
       createdAt: Date
     }, ExtArgs["result"]["user"]>
@@ -1803,6 +1815,7 @@ export namespace Prisma {
     readonly name: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
     readonly passwordHash: FieldRef<"User", 'String'>
+    readonly phone: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'Role'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
   }
@@ -3370,6 +3383,8 @@ export namespace Prisma {
     totalPrice: number | null
     paymentType: string | null
     status: $Enums.ReservationStatus | null
+    guestName: string | null
+    guestPhone: string | null
     createdAt: Date | null
   }
 
@@ -3383,6 +3398,8 @@ export namespace Prisma {
     totalPrice: number | null
     paymentType: string | null
     status: $Enums.ReservationStatus | null
+    guestName: string | null
+    guestPhone: string | null
     createdAt: Date | null
   }
 
@@ -3396,6 +3413,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType: number
     status: number
+    guestName: number
+    guestPhone: number
     createdAt: number
     _all: number
   }
@@ -3423,6 +3442,8 @@ export namespace Prisma {
     totalPrice?: true
     paymentType?: true
     status?: true
+    guestName?: true
+    guestPhone?: true
     createdAt?: true
   }
 
@@ -3436,6 +3457,8 @@ export namespace Prisma {
     totalPrice?: true
     paymentType?: true
     status?: true
+    guestName?: true
+    guestPhone?: true
     createdAt?: true
   }
 
@@ -3449,6 +3472,8 @@ export namespace Prisma {
     totalPrice?: true
     paymentType?: true
     status?: true
+    guestName?: true
+    guestPhone?: true
     createdAt?: true
     _all?: true
   }
@@ -3549,6 +3574,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType: string
     status: $Enums.ReservationStatus
+    guestName: string | null
+    guestPhone: string | null
     createdAt: Date
     _count: ReservationCountAggregateOutputType | null
     _avg: ReservationAvgAggregateOutputType | null
@@ -3581,6 +3608,8 @@ export namespace Prisma {
     totalPrice?: boolean
     paymentType?: boolean
     status?: boolean
+    guestName?: boolean
+    guestPhone?: boolean
     createdAt?: boolean
     court?: boolean | CourtDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3596,6 +3625,8 @@ export namespace Prisma {
     totalPrice?: boolean
     paymentType?: boolean
     status?: boolean
+    guestName?: boolean
+    guestPhone?: boolean
     createdAt?: boolean
     court?: boolean | CourtDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3611,6 +3642,8 @@ export namespace Prisma {
     totalPrice?: boolean
     paymentType?: boolean
     status?: boolean
+    guestName?: boolean
+    guestPhone?: boolean
     createdAt?: boolean
     court?: boolean | CourtDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3626,10 +3659,12 @@ export namespace Prisma {
     totalPrice?: boolean
     paymentType?: boolean
     status?: boolean
+    guestName?: boolean
+    guestPhone?: boolean
     createdAt?: boolean
   }
 
-  export type ReservationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "courtId" | "userId" | "date" | "startHour" | "endHour" | "totalPrice" | "paymentType" | "status" | "createdAt", ExtArgs["result"]["reservation"]>
+  export type ReservationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "courtId" | "userId" | "date" | "startHour" | "endHour" | "totalPrice" | "paymentType" | "status" | "guestName" | "guestPhone" | "createdAt", ExtArgs["result"]["reservation"]>
   export type ReservationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     court?: boolean | CourtDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3659,6 +3694,8 @@ export namespace Prisma {
       totalPrice: number
       paymentType: string
       status: $Enums.ReservationStatus
+      guestName: string | null
+      guestPhone: string | null
       createdAt: Date
     }, ExtArgs["result"]["reservation"]>
     composites: {}
@@ -4094,6 +4131,8 @@ export namespace Prisma {
     readonly totalPrice: FieldRef<"Reservation", 'Int'>
     readonly paymentType: FieldRef<"Reservation", 'String'>
     readonly status: FieldRef<"Reservation", 'ReservationStatus'>
+    readonly guestName: FieldRef<"Reservation", 'String'>
+    readonly guestPhone: FieldRef<"Reservation", 'String'>
     readonly createdAt: FieldRef<"Reservation", 'DateTime'>
   }
     
@@ -4533,6 +4572,7 @@ export namespace Prisma {
     name: 'name',
     email: 'email',
     passwordHash: 'passwordHash',
+    phone: 'phone',
     role: 'role',
     createdAt: 'createdAt'
   };
@@ -4560,6 +4600,8 @@ export namespace Prisma {
     totalPrice: 'totalPrice',
     paymentType: 'paymentType',
     status: 'status',
+    guestName: 'guestName',
+    guestPhone: 'guestPhone',
     createdAt: 'createdAt'
   };
 
@@ -4580,6 +4622,14 @@ export namespace Prisma {
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -4696,6 +4746,7 @@ export namespace Prisma {
     name?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
+    phone?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
     createdAt?: DateTimeFilter<"User"> | Date | string
     reservations?: ReservationListRelationFilter
@@ -4706,6 +4757,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrderInput | SortOrder
     role?: SortOrder
     createdAt?: SortOrder
     reservations?: ReservationOrderByRelationAggregateInput
@@ -4719,6 +4771,7 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
+    phone?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
     createdAt?: DateTimeFilter<"User"> | Date | string
     reservations?: ReservationListRelationFilter
@@ -4729,6 +4782,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrderInput | SortOrder
     role?: SortOrder
     createdAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -4744,6 +4798,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
     passwordHash?: StringWithAggregatesFilter<"User"> | string
+    phone?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -4813,6 +4868,8 @@ export namespace Prisma {
     totalPrice?: IntFilter<"Reservation"> | number
     paymentType?: StringFilter<"Reservation"> | string
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
+    guestName?: StringNullableFilter<"Reservation"> | string | null
+    guestPhone?: StringNullableFilter<"Reservation"> | string | null
     createdAt?: DateTimeFilter<"Reservation"> | Date | string
     court?: XOR<CourtScalarRelationFilter, CourtWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -4828,6 +4885,8 @@ export namespace Prisma {
     totalPrice?: SortOrder
     paymentType?: SortOrder
     status?: SortOrder
+    guestName?: SortOrderInput | SortOrder
+    guestPhone?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     court?: CourtOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
@@ -4846,6 +4905,8 @@ export namespace Prisma {
     totalPrice?: IntFilter<"Reservation"> | number
     paymentType?: StringFilter<"Reservation"> | string
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
+    guestName?: StringNullableFilter<"Reservation"> | string | null
+    guestPhone?: StringNullableFilter<"Reservation"> | string | null
     createdAt?: DateTimeFilter<"Reservation"> | Date | string
     court?: XOR<CourtScalarRelationFilter, CourtWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -4861,6 +4922,8 @@ export namespace Prisma {
     totalPrice?: SortOrder
     paymentType?: SortOrder
     status?: SortOrder
+    guestName?: SortOrderInput | SortOrder
+    guestPhone?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: ReservationCountOrderByAggregateInput
     _avg?: ReservationAvgOrderByAggregateInput
@@ -4882,6 +4945,8 @@ export namespace Prisma {
     totalPrice?: IntWithAggregatesFilter<"Reservation"> | number
     paymentType?: StringWithAggregatesFilter<"Reservation"> | string
     status?: EnumReservationStatusWithAggregatesFilter<"Reservation"> | $Enums.ReservationStatus
+    guestName?: StringNullableWithAggregatesFilter<"Reservation"> | string | null
+    guestPhone?: StringNullableWithAggregatesFilter<"Reservation"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Reservation"> | Date | string
   }
 
@@ -4890,6 +4955,7 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
     role?: $Enums.Role
     createdAt?: Date | string
     reservations?: ReservationCreateNestedManyWithoutUserInput
@@ -4900,6 +4966,7 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
     role?: $Enums.Role
     createdAt?: Date | string
     reservations?: ReservationUncheckedCreateNestedManyWithoutUserInput
@@ -4910,6 +4977,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reservations?: ReservationUpdateManyWithoutUserNestedInput
@@ -4920,6 +4988,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reservations?: ReservationUncheckedUpdateManyWithoutUserNestedInput
@@ -4930,6 +4999,7 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
     role?: $Enums.Role
     createdAt?: Date | string
   }
@@ -4939,6 +5009,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4948,6 +5019,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5013,6 +5085,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
     court: CourtCreateNestedOneWithoutReservationsInput
     user: UserCreateNestedOneWithoutReservationsInput
@@ -5028,6 +5102,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
   }
 
@@ -5039,6 +5115,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     court?: CourtUpdateOneRequiredWithoutReservationsNestedInput
     user?: UserUpdateOneRequiredWithoutReservationsNestedInput
@@ -5054,6 +5132,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5067,6 +5147,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
   }
 
@@ -5078,6 +5160,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5091,6 +5175,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5107,6 +5193,21 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type EnumRoleFilter<$PrismaModel = never> = {
@@ -5133,6 +5234,11 @@ export namespace Prisma {
     none?: ReservationWhereInput
   }
 
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type ReservationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -5142,6 +5248,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
   }
@@ -5151,6 +5258,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
   }
@@ -5160,6 +5268,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrder
     role?: SortOrder
     createdAt?: SortOrder
   }
@@ -5180,6 +5289,24 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type EnumRoleWithAggregatesFilter<$PrismaModel = never> = {
@@ -5306,6 +5433,8 @@ export namespace Prisma {
     totalPrice?: SortOrder
     paymentType?: SortOrder
     status?: SortOrder
+    guestName?: SortOrder
+    guestPhone?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -5325,6 +5454,8 @@ export namespace Prisma {
     totalPrice?: SortOrder
     paymentType?: SortOrder
     status?: SortOrder
+    guestName?: SortOrder
+    guestPhone?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -5338,6 +5469,8 @@ export namespace Prisma {
     totalPrice?: SortOrder
     paymentType?: SortOrder
     status?: SortOrder
+    guestName?: SortOrder
+    guestPhone?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -5373,6 +5506,10 @@ export namespace Prisma {
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
   export type EnumRoleFieldUpdateOperationsInput = {
@@ -5511,6 +5648,20 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedEnumRoleFilter<$PrismaModel = never> = {
     equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
     in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
@@ -5555,6 +5706,34 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumRoleWithAggregatesFilter<$PrismaModel = never> = {
@@ -5650,6 +5829,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
     court: CourtCreateNestedOneWithoutReservationsInput
   }
@@ -5663,6 +5844,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
   }
 
@@ -5705,6 +5888,8 @@ export namespace Prisma {
     totalPrice?: IntFilter<"Reservation"> | number
     paymentType?: StringFilter<"Reservation"> | string
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
+    guestName?: StringNullableFilter<"Reservation"> | string | null
+    guestPhone?: StringNullableFilter<"Reservation"> | string | null
     createdAt?: DateTimeFilter<"Reservation"> | Date | string
   }
 
@@ -5716,6 +5901,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutReservationsInput
   }
@@ -5729,6 +5916,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
   }
 
@@ -5782,6 +5971,7 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
     role?: $Enums.Role
     createdAt?: Date | string
   }
@@ -5791,6 +5981,7 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
     role?: $Enums.Role
     createdAt?: Date | string
   }
@@ -5841,6 +6032,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5850,6 +6042,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5863,6 +6056,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
   }
 
@@ -5874,6 +6069,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     court?: CourtUpdateOneRequiredWithoutReservationsNestedInput
   }
@@ -5887,6 +6084,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5899,6 +6098,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5911,6 +6112,8 @@ export namespace Prisma {
     totalPrice: number
     paymentType?: string
     status?: $Enums.ReservationStatus
+    guestName?: string | null
+    guestPhone?: string | null
     createdAt?: Date | string
   }
 
@@ -5922,6 +6125,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutReservationsNestedInput
   }
@@ -5935,6 +6140,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5947,6 +6154,8 @@ export namespace Prisma {
     totalPrice?: IntFieldUpdateOperationsInput | number
     paymentType?: StringFieldUpdateOperationsInput | string
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+    guestName?: NullableStringFieldUpdateOperationsInput | string | null
+    guestPhone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

@@ -22,6 +22,7 @@ export async function registerCustomer(
   const raw = {
     name: formData.get("name"),
     email: formData.get("email"),
+    phone: formData.get("phone"),
     password: formData.get("password"),
   };
 
@@ -33,7 +34,7 @@ export async function registerCustomer(
     };
   }
 
-  const { name, email, password } = parsed.data;
+  const { name, email, phone, password } = parsed.data;
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -44,6 +45,7 @@ export async function registerCustomer(
     data: {
       name,
       email,
+      phone,
       passwordHash: hashPassword(password),
       role: "CUSTOMER",
     },

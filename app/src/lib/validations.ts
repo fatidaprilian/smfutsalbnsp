@@ -8,6 +8,7 @@ export const loginSchema = z.object({
 export const registerSchema = z.object({
   name: z.string().min(1, "Nama wajib diisi").max(100, "Nama terlalu panjang"),
   email: z.string().email("Email tidak valid"),
+  phone: z.string().min(9, "Nomor WA minimal 9 angka").regex(/^[0-9+]+$/, "Format tidak valid"),
   password: z.string().min(8, "Password minimal 8 karakter").max(128, "Password terlalu panjang"),
 });
 
@@ -28,6 +29,8 @@ export const reservationSchema = z.object({
     .min(9, "Jam selesai minimal 09:00")
     .max(22, "Jam selesai maksimal 22:00"),
   paymentType: z.enum(["DP", "FULL"]).default("DP"),
+  guestName: z.string().optional(),
+  guestPhone: z.string().optional(),
 }).refine((data) => data.endHour > data.startHour, {
   message: "Jam selesai harus lebih besar dari jam mulai",
   path: ["endHour"],

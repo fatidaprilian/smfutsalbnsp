@@ -29,6 +29,8 @@ type Reservation = {
   totalPrice: number;
   status: string;
   paymentType: string;
+  guestName?: string | null;
+  guestPhone?: string | null;
   court: { name: string; type: string };
   user: { name: string; email: string };
   createdAt: string;
@@ -185,8 +187,42 @@ export function AdminReservationClient({
           </div>
         )}
 
-        <form action={createAction} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4" noValidate>
+        <form action={createAction} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" noValidate>
           <input type="hidden" name="date" value={selectedDate} />
+          <div>
+            <label htmlFor="guestName" className="block text-sm font-medium text-gray-700 mb-1">Nama (Opsional)</label>
+            <input
+              id="guestName"
+              name="guestName"
+              type="text"
+              placeholder="Nama Walk-in"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                createState.fieldErrors?.guestName
+                  ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
+            />
+            {createState.fieldErrors?.guestName && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{createState.fieldErrors.guestName[0]}</p>
+            )}
+          </div>
+          <div>
+            <label htmlFor="guestPhone" className="block text-sm font-medium text-gray-700 mb-1">Nomor WA (Opsional)</label>
+            <input
+              id="guestPhone"
+              name="guestPhone"
+              type="tel"
+              placeholder="08..."
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                createState.fieldErrors?.guestPhone
+                  ? "border-red-400 focus:ring-red-500/20 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
+            />
+            {createState.fieldErrors?.guestPhone && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{createState.fieldErrors.guestPhone[0]}</p>
+            )}
+          </div>
           <div>
             <label htmlFor="courtId" className="block text-sm font-medium text-gray-700 mb-1">Lapangan</label>
             <select
@@ -367,8 +403,8 @@ export function AdminReservationClient({
                   <React.Fragment key={r.id}>
                     <tr className={`border-b border-gray-100 hover:bg-gray-50 ${editingId === r.id ? "bg-blue-50/50" : ""}`}>
                       <td className="py-3 px-4">
-                        <div className="font-medium">{r.user.name}</div>
-                        <div className="text-sm text-gray-400">{r.user.email}</div>
+                        <div className="font-medium">{r.guestName || r.user.name} {r.guestName && <span className="text-xs font-normal bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full ml-1">Walk-in</span>}</div>
+                        <div className="text-sm text-gray-400">{r.guestPhone || r.user.email}</div>
                       </td>
                       <td className="py-3 px-4">{r.court.name}</td>
                       <td className="py-3 px-4">
